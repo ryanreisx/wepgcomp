@@ -12,7 +12,9 @@
       "Bash(node -e \"const { PrismaClient } = require\\('@prisma/client'\\); console.log\\(typeof PrismaClient\\);\")",
       "Bash(npx tsc *)",
       "Bash(git add *)",
-      "Bash(git commit -m ' *)"
+      "Bash(git commit -m ' *)",
+      "Bash(node -e ' *)",
+      "Bash(timeout 15 npx nest start)"
     ]
   }
 }

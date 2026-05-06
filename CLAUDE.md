@@ -137,6 +137,38 @@ app.setGlobalPrefix('api/v1');
 - `@CurrentUser()` — injeta o usuário do JWT no parâmetro.
 - `JwtAuthGuard` — global (APP_GUARD). Todas as rotas protegidas por padrão.
 
+### 4.6. Prisma 7.x — Driver Adapter
+
+Este projeto usa **Prisma 7.x** com o driver adapter `@prisma/adapter-pg` (pacote `pg` como driver PostgreSQL nativo). Dependências adicionadas ao `backend/package.json`:
+
+| Pacote | Tipo | Finalidade |
+|---|---|---|
+| `@prisma/adapter-pg` | produção | Adapter oficial do Prisma para PostgreSQL via `pg` |
+| `pg` | produção | Driver PostgreSQL nativo usado pelo adapter |
+| `@types/pg` | devDependency | Tipagens TypeScript para `pg` |
+
+O `PrismaService` usa **`extends PrismaClient` com driver adapter** — não é possível chamar `super({})` sem adapter no Prisma 7 (o engine type `"client"`, padrão desta versão, exige `adapter` ou `accelerateUrl`). A implementação correta:
+
+```typescript
+import { PrismaClient } from '@prisma/client';
+import { PrismaPg } from '@prisma/adapter-pg';
+import { ConfigService } from '@nestjs/config';
+
+@Injectable()
+export class PrismaService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
+  constructor(configService: ConfigService) {
+    const databaseUrl = configService.get<string>('DATABASE_URL')!;
+    const adapter = new PrismaPg(databaseUrl);
+    super({ adapter });
+  }
+}
+```
+
+**Regras:**
+- Nunca instancie `PrismaClient` ou `PrismaService` sem passar o `adapter`.
+- A `DATABASE_URL` é lida via `ConfigService` (nunca hardcoded).
+- O schema (`prisma/schema.prisma`) usa o generator `prisma-client-js` — não alterar para `prisma-client`.
+
 ---
 
 ## 5. Convenções de Código — Frontend
