@@ -2,7 +2,17 @@
   "permissions": {
     "allow": [
       "Bash(docker compose *)",
-      "PowerShell(docker compose config *)"
+      "PowerShell(docker compose config *)",
+      "Bash(npx @nestjs/cli@latest new backend --skip-git --package-manager npm --strict --language ts)",
+      "Bash(npm install *)",
+      "Bash(mkdir \"C:\\\\Users\\\\ryan0\\\\OneDrive\\\\Área de Trabalho\\\\wepgcomp\\\\backend\\\\src\\\\prisma\")",
+      "Bash(mkdir -p \"C:\\\\Users\\\\ryan0\\\\OneDrive\\\\Área de Trabalho\\\\wepgcomp\\\\backend\\\\src\\\\common\\\\decorators\")",
+      "Bash(npm run *)",
+      "Bash(npx prisma *)",
+      "Bash(node -e \"const { PrismaClient } = require\\('@prisma/client'\\); console.log\\(typeof PrismaClient\\);\")",
+      "Bash(npx tsc *)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)"
     ]
   }
 }
