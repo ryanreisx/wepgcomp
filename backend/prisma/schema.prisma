@@ -5,3 +5,292 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+// ─── Enums ───────────────────────────────────────────────
+
+enum Profile {
+  DoctoralStudent
+  Professor
+  Listener
+
+  @@map("profile")
+}
+
+enum UserLevel {
+  Superadmin
+  Admin
+  Default
+
+  @@map("user_level")
+}
+
+enum SubmissionStatus {
+  Submitted
+  UnderReview
+  Accepted
+  Rejected
+  Withdrawn
+}
+
+enum PresentationBlockType {
+  Presentation
+  Keynote
+  Break
+  Other
+}
+
+enum PresentationStatus {
+  Scheduled
+  Completed
+  Cancelled
+}
+
+enum PanelistStatus {
+  Confirmed
+  Declined
+  Pending
+}
+
+enum CommitteeLevel {
+  Committee
+  Coordinator
+
+  @@map("committee_level")
+}
+
+enum CommitteeRole {
+  Organizer
+  Reviewer
+  Evaluator
+}
+
+// ─── Models ──────────────────────────────────────────────
+
+model UserAccount {
+  id                 String   @id @default(uuid())
+  name               String   @db.VarChar(255)
+  email              String   @unique @db.VarChar(255)
+  password           String   @db.VarChar(255)
+  registrationNumber String?  @unique @db.VarChar(20)
+  photoFilePath      String?  @db.VarChar(255)
+  profile            Profile  @default(DoctoralStudent)
+  level              UserLevel @default(Default)
+  isActive           Boolean  @default(true)
+  isVerified         Boolean  @default(false)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  emailVerification   EmailVerification?
+  advisedSubmissions  Submission[]        @relation("Advisor")
+  authoredSubmissions Submission[]        @relation("MainAuthor")
+  evaluations         Evaluation[]
+  panelists           Panelist[]
+  awardedPanelists    AwardedPanelist[]
+  committeeMembers    CommitteeMember[]
+  certificates        Certificate[]
+}
+
+model EmailVerification {
+  id                      String    @id @default(uuid())
+  userId                  String    @unique
+  emailVerificationToken  String?   @unique
+  emailVerifiedAt         DateTime?
+  emailVerificationSentAt DateTime?
+  createdAt               DateTime  @default(now())
+  updatedAt               DateTime  @updatedAt
+
+  user UserAccount @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model EventEdition {
+  id                                String   @id @default(uuid())
+  name                              String   @db.VarChar(255)
+  description                       String   @db.Text
+  callForPapersText                 String   @db.Text
+  partnersText                      String   @db.Text
+  location                          String   @db.Text
+  startDate                         DateTime
+  endDate                           DateTime
+  submissionStartDate               DateTime
+  submissionDeadline                DateTime
+  isActive                          Boolean  @default(false)
+  isEvaluationRestrictToLoggedUsers Boolean  @default(true)
+  presentationDuration              Int      @default(20)
+  presentationsPerPresentationBlock Int      @default(6)
+  createdAt                         DateTime @default(now())
+  updatedAt                         DateTime @updatedAt
+
+  submissions        Submission[]
+  evaluationCriteria EvaluationCriteria[]
+  rooms              Room[]
+  presentationBlocks PresentationBlock[]
+  committeeMembers   CommitteeMember[]
+  certificates       Certificate[]
+  awardedPanelists   AwardedPanelist[]
+  guidance           Guidance?
+}
+
+model Submission {
+  id                          String           @id @default(uuid())
+  advisorId                   String
+  mainAuthorId                String
+  eventEditionId              String
+  title                       String           @db.VarChar(255)
+  abstract                    String           @db.Text
+  pdfFile                     String           @db.VarChar(255)
+  phoneNumber                 String           @db.VarChar(20)
+  proposedPresentationBlockId String?          @map("proposed_presentation_block_id")
+  proposedPositionWithinBlock Int?
+  coAdvisor                   String?          @db.VarChar(255)
+  status                      SubmissionStatus @default(Submitted)
+  createdAt                   DateTime         @default(now())
+  updatedAt                   DateTime         @updatedAt
+
+  advisor                   UserAccount        @relation("Advisor", fields: [advisorId], references: [id])
+  mainAuthor                UserAccount        @relation("MainAuthor", fields: [mainAuthorId], references: [id])
+  eventEdition              EventEdition       @relation(fields: [eventEditionId], references: [id])
+  proposedPresentationBlock PresentationBlock? @relation("ProposedBlock", fields: [proposedPresentationBlockId], references: [id])
+  evaluations               Evaluation[]
+  presentation              Presentation?
+}
+
+model EvaluationCriteria {
+  id             String   @id @default(uuid())
+  eventEditionId String
+  title          String   @db.VarChar(255)
+  description    String   @db.Text
+  weightRadio    Float?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  eventEdition EventEdition @relation(fields: [eventEditionId], references: [id])
+  evaluations  Evaluation[]
+}
+
+model Evaluation {
+  id                   String   @id @default(uuid())
+  userId               String?
+  evaluationCriteriaId String
+  submissionId         String
+  score                Float
+  comments             String?  @db.Text
+  name                 String?  @db.VarChar(255)
+  email                String?  @db.VarChar(255)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  user               UserAccount?       @relation(fields: [userId], references: [id])
+  evaluationCriteria EvaluationCriteria @relation(fields: [evaluationCriteriaId], references: [id])
+  submission         Submission         @relation(fields: [submissionId], references: [id])
+}
+
+model Room {
+  id             String   @id @default(uuid())
+  eventEditionId String
+  name           String   @db.VarChar(255)
+  description    String?  @db.Text
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  eventEdition       EventEdition        @relation(fields: [eventEditionId], references: [id])
+  presentationBlocks PresentationBlock[]
+}
+
+model PresentationBlock {
+  id             String                @id @default(uuid())
+  eventEditionId String
+  roomId         String?
+  type           PresentationBlockType
+  title          String?               @db.VarChar(255)
+  speakerName    String?               @db.VarChar(255)
+  startTime      DateTime
+  duration       Int
+  createdAt      DateTime              @default(now())
+  updatedAt      DateTime              @updatedAt
+
+  eventEdition        EventEdition   @relation(fields: [eventEditionId], references: [id])
+  room                Room?          @relation(fields: [roomId], references: [id])
+  presentations       Presentation[]
+  panelists           Panelist[]
+  proposedSubmissions Submission[]   @relation("ProposedBlock")
+}
+
+model Presentation {
+  id                     String             @id @default(uuid())
+  submissionId           String             @unique
+  presentationBlockId    String
+  positionWithinBlock    Int
+  status                 PresentationStatus @default(Scheduled)
+  publicAverageScore     Float?
+  evaluatorsAverageScore Float?
+  createdAt              DateTime           @default(now())
+  updatedAt              DateTime           @updatedAt
+
+  submission        Submission        @relation(fields: [submissionId], references: [id])
+  presentationBlock PresentationBlock @relation(fields: [presentationBlockId], references: [id])
+}
+
+model Panelist {
+  id                  String         @id @default(uuid())
+  presentationBlockId String
+  userId              String
+  status              PanelistStatus @default(Confirmed)
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
+
+  presentationBlock PresentationBlock @relation(fields: [presentationBlockId], references: [id])
+  user              UserAccount       @relation(fields: [userId], references: [id])
+}
+
+model AwardedPanelist {
+  eventEditionId String
+  userId         String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  eventEdition EventEdition @relation(fields: [eventEditionId], references: [id])
+  user         UserAccount  @relation(fields: [userId], references: [id])
+
+  @@id([eventEditionId, userId])
+}
+
+model CommitteeMember {
+  id             String         @id @default(uuid())
+  eventEditionId String
+  userId         String
+  level          CommitteeLevel
+  role           CommitteeRole
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  eventEdition EventEdition @relation(fields: [eventEditionId], references: [id])
+  user         UserAccount  @relation(fields: [userId], references: [id])
+
+  @@unique([eventEditionId, userId])
+}
+
+model Certificate {
+  id             String   @id @default(uuid())
+  eventEditionId String
+  userId         String
+  filePath       String
+  isEmailSent    Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  eventEdition EventEdition @relation(fields: [eventEditionId], references: [id])
+  user         UserAccount  @relation(fields: [userId], references: [id])
+}
+
+model Guidance {
+  id               String   @id @default(uuid())
+  eventEditionId   String   @unique
+  summary          String?  @db.Text
+  authorGuidance   String?  @db.Text
+  reviewerGuidance String?  @db.Text
+  audienceGuidance String?  @db.Text
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  eventEdition EventEdition @relation(fields: [eventEditionId], references: [id])
+}
