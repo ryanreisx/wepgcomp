@@ -14,7 +14,14 @@
       "Bash(git add *)",
       "Bash(git commit -m ' *)",
       "Bash(node -e ' *)",
-      "Bash(timeout 15 npx nest start)"
+      "Bash(timeout 15 npx nest start)",
+      "Bash(npm --version)",
+      "Bash(npx create-next-app@latest frontend --typescript --eslint --app --src-dir --no-tailwind --import-alias \"@/*\" --use-npm --yes)",
+      "Bash(Remove-Item frontend\\\\.gitkeep)",
+      "Bash(npx jest *)",
+      "Bash(node -e \"const c = require\\('./node_modules/@jest/core/node_modules/jest-config/build/index.js'\\); console.log\\(Object.keys\\(c.defaults\\).filter\\(k => k.toLowerCase\\(\\).includes\\('setup'\\)\\)\\)\")",
+      "Bash(node -e \"const yaml = require\\('yaml'\\); const fs = require\\('fs'\\); ['ci-backend.yml','ci-frontend.yml','codeql.yml'].forEach\\(f => { try { yaml.parse\\(fs.readFileSync\\('.github/workflows/'+f,'utf8'\\)\\); console.log\\(f+': OK'\\); } catch\\(e\\) { console.log\\(f+': ERRO - '+e.message\\); } }\\)\")",
+      "Bash(node -e \"const js_yaml = require\\('js-yaml'\\); const fs = require\\('fs'\\); ['ci-backend.yml','ci-frontend.yml','codeql.yml'].forEach\\(f => { try { js_yaml.load\\(fs.readFileSync\\('.github/workflows/'+f,'utf8'\\)\\); console.log\\(f+': OK'\\); } catch\\(e\\) { console.log\\(f+': ERRO - '+e.message\\); } }\\)\")"
     ]
   }
 }
