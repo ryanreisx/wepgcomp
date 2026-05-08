@@ -1,10 +1,19 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { BadRequestException, ConflictException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  ForbiddenException,
+  UnauthorizedException,
+} from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import * as bcrypt from 'bcrypt';
 import { AuthService } from './auth.service';
 import { UserService } from '../user/user.service';
 import { MessagingService } from '../messaging/messaging.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { Profile, UserLevel } from '@prisma/client';
+
+jest.mock('bcrypt');
 
 const baseMockUser = {
   id: 'uuid-1',
@@ -18,6 +27,12 @@ const baseMockUser = {
   isVerified: false,
   createdAt: new Date(),
   updatedAt: new Date(),
+};
+
+const fullMockUser = {
+  ...baseMockUser,
+  password: '$2b$10$hashedpassword',
+  isVerified: true,
 };
 
 const mockEmailVerification = {
@@ -41,6 +56,10 @@ const mockMessagingService = {
   publish: jest.fn().mockResolvedValue(undefined),
 };
 
+const mockJwtService = {
+  sign: jest.fn().mockReturnValue('signed-jwt-token'),
+};
+
 const mockPrismaService = {
   emailVerification: {
     create: jest.fn(),
@@ -50,6 +69,9 @@ const mockPrismaService = {
   userAccount: {
     update: jest.fn(),
     findUnique: jest.fn(),
+  },
+  committeeMember: {
+    findFirst: jest.fn(),
   },
 };
 
@@ -65,6 +87,7 @@ describe('AuthService', () => {
         { provide: UserService, useValue: mockUserService },
         { provide: MessagingService, useValue: mockMessagingService },
         { provide: PrismaService, useValue: mockPrismaService },
+        { provide: JwtService, useValue: mockJwtService },
       ],
     }).compile();
 
@@ -264,6 +287,99 @@ describe('AuthService', () => {
         expect.objectContaining({ email: 'joao@ufba.br' }),
       );
       expect(result).toHaveProperty('message');
+    });
+  });
+
+  describe('login', () => {
+    const loginDto = { email: 'joao@ufba.br', password: 'Abcd1234!' };
+
+    it('should return token and user on valid login', async () => {
+      mockPrismaService.userAccount.findUnique.mockResolvedValue(fullMockUser);
+      (bcrypt.compare as jest.Mock).mockResolvedValue(true);
+
+      const result = await service.login(loginDto);
+
+      expect(result).toHaveProperty('token', 'signed-jwt-token');
+      expect(result.user).toHaveProperty('id', 'uuid-1');
+      expect(result.user).toHaveProperty('email', 'joao@ufba.br');
+      expect(result.user).not.toHaveProperty('password');
+      expect(mockJwtService.sign).toHaveBeenCalledWith({
+        sub: 'uuid-1',
+        profile: Profile.DoctoralStudent,
+        level: UserLevel.Default,
+      });
+    });
+
+    it('should throw UnauthorizedException when email not found', async () => {
+      mockPrismaService.userAccount.findUnique.mockResolvedValue(null);
+
+      await expect(service.login(loginDto)).rejects.toThrow(
+        UnauthorizedException,
+      );
+    });
+
+    it('should throw UnauthorizedException on wrong password', async () => {
+      mockPrismaService.userAccount.findUnique.mockResolvedValue(fullMockUser);
+      (bcrypt.compare as jest.Mock).mockResolvedValue(false);
+
+      await expect(service.login(loginDto)).rejects.toThrow(
+        UnauthorizedException,
+      );
+    });
+
+    it('should throw ForbiddenException when user not verified', async () => {
+      mockPrismaService.userAccount.findUnique.mockResolvedValue({
+        ...fullMockUser,
+        isVerified: false,
+      });
+      (bcrypt.compare as jest.Mock).mockResolvedValue(true);
+
+      await expect(service.login(loginDto)).rejects.toThrow(ForbiddenException);
+    });
+
+    it('should throw ForbiddenException when user inactive', async () => {
+      mockPrismaService.userAccount.findUnique.mockResolvedValue({
+        ...fullMockUser,
+        isActive: false,
+      });
+      (bcrypt.compare as jest.Mock).mockResolvedValue(true);
+
+      await expect(service.login(loginDto)).rejects.toThrow(ForbiddenException);
+    });
+  });
+
+  describe('getMe', () => {
+    it('should return user with isCommitteeOfActiveEdition = false when no committee member', async () => {
+      mockPrismaService.userAccount.findUnique.mockResolvedValue(fullMockUser);
+      mockPrismaService.committeeMember.findFirst.mockResolvedValue(null);
+
+      const result = await service.getMe('uuid-1');
+
+      expect(result.isCommitteeOfActiveEdition).toBe(false);
+      expect(result).toHaveProperty('id', 'uuid-1');
+      expect(result).not.toHaveProperty('password');
+    });
+
+    it('should return user with isCommitteeOfActiveEdition = true when committee member of active edition', async () => {
+      mockPrismaService.userAccount.findUnique.mockResolvedValue(fullMockUser);
+      mockPrismaService.committeeMember.findFirst.mockResolvedValue({
+        id: 'cm-1',
+        userId: 'uuid-1',
+        eventEditionId: 'ee-1',
+      });
+
+      const result = await service.getMe('uuid-1');
+
+      expect(result.isCommitteeOfActiveEdition).toBe(true);
+    });
+
+    it('should return user with isCommitteeOfActiveEdition = false when committee member of inactive edition', async () => {
+      mockPrismaService.userAccount.findUnique.mockResolvedValue(fullMockUser);
+      mockPrismaService.committeeMember.findFirst.mockResolvedValue(null);
+
+      const result = await service.getMe('uuid-1');
+
+      expect(result.isCommitteeOfActiveEdition).toBe(false);
     });
   });
 });

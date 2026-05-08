@@ -1,11 +1,19 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { randomUUID } from 'crypto';
+import * as bcrypt from 'bcrypt';
 import { Profile } from '@prisma/client';
 import { UserService } from '../user/user.service';
 import { MessagingService } from '../messaging/messaging.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { RegisterDto } from './dto/register.dto';
 import { ResendVerificationDto } from './dto/resend-verification.dto';
+import { LoginDto } from './dto/login.dto';
 
 const PASSWORD_REGEX =
   /^(?=.*[a-z])(?=.*[A-Z])(?=(?:.*\d){4,})(?=.*[^a-zA-Z0-9]).{8,}$/;
@@ -16,6 +24,7 @@ export class AuthService {
     private readonly userService: UserService,
     private readonly messagingService: MessagingService,
     private readonly prisma: PrismaService,
+    private readonly jwtService: JwtService,
   ) {}
 
   async register(dto: RegisterDto) {
@@ -139,5 +148,75 @@ export class AuthService {
     });
 
     return { message: 'If the email exists, a verification link was sent.' };
+  }
+
+  async login(dto: LoginDto) {
+    const user = await this.prisma.userAccount.findUnique({
+      where: { email: dto.email },
+    });
+
+    if (!user) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+
+    const isPasswordValid = await bcrypt.compare(dto.password, user.password);
+    if (!isPasswordValid) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+
+    if (!user.isVerified) {
+      throw new ForbiddenException('Confirme seu e-mail');
+    }
+
+    if (!user.isActive) {
+      throw new ForbiddenException('Aguardando aprovação');
+    }
+
+    const payload = {
+      sub: user.id,
+      profile: user.profile,
+      level: user.level,
+    };
+    const token = this.jwtService.sign(payload);
+
+    return {
+      token,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        profile: user.profile,
+        level: user.level,
+      },
+    };
+  }
+
+  async getMe(userId: string) {
+    const user = await this.prisma.userAccount.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+    }
+
+    const committeeMember = await this.prisma.committeeMember.findFirst({
+      where: {
+        userId,
+        eventEdition: {
+          isActive: true,
+          endDate: { gte: new Date() },
+        },
+      },
+    });
+
+    return {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      profile: user.profile,
+      level: user.level,
+      isCommitteeOfActiveEdition: !!committeeMember,
+    };
   }
 }

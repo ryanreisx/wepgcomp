@@ -169,6 +169,12 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
 - A `DATABASE_URL` é lida via `ConfigService` (nunca hardcoded).
 - O schema (`prisma/schema.prisma`) usa o generator `prisma-client-js` — não alterar para `prisma-client`.
 
+### 4.7. Hurdles conhecidos (TypeScript)
+
+1. **`import type` para tipos do Express em controllers decorados.** Quando `isolatedModules` e `emitDecoratorMetadata` estão ativos, tipos usados em assinaturas decoradas (ex: `@Res() res: Response`) devem ser importados com `import type { Response } from 'express'`, não `import { Response }`. Caso contrário o compilador emite TS1272.
+
+2. **`expiresIn` do JWT aceita `StringValue`, não `string`.** O tipo `SignOptions.expiresIn` do `jsonwebtoken` (via `@types/ms`) é um template literal (`StringValue`), não `string` genérico. Ao ler `JWT_EXPIRATION` do `ConfigService`, fazer cast explícito: `configService.get<string>('JWT_EXPIRATION', '7d') as StringValue` (importar `import type { StringValue } from 'ms'`).
+
 ---
 
 ## 5. Convenções de Código — Frontend
