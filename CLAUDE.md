@@ -175,6 +175,8 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
 
 2. **`expiresIn` do JWT aceita `StringValue`, não `string`.** O tipo `SignOptions.expiresIn` do `jsonwebtoken` (via `@types/ms`) é um template literal (`StringValue`), não `string` genérico. Ao ler `JWT_EXPIRATION` do `ConfigService`, fazer cast explícito: `configService.get<string>('JWT_EXPIRATION', '7d') as StringValue` (importar `import type { StringValue } from 'ms'`).
 
+3. **`ConfigService.get()` retorna string para variáveis numéricas.** Variáveis de ambiente são sempre strings. `configService.get<number>('BCRYPT_SALT_ROUNDS', 10)` retorna `"10"` (string), não `10` (number), o que causa erro em funções que esperam número (ex: `bcrypt.hash`). Sempre usar `parseInt(this.configService.get<string>('BCRYPT_SALT_ROUNDS', '10'), 10)` para variáveis numéricas.
+
 ---
 
 ## 5. Convenções de Código — Frontend

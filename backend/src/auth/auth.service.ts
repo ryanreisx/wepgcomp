@@ -14,6 +14,9 @@ import { PrismaService } from '../prisma/prisma.service';
 import { RegisterDto } from './dto/register.dto';
 import { ResendVerificationDto } from './dto/resend-verification.dto';
 import { LoginDto } from './dto/login.dto';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
+import { ConfigService } from '@nestjs/config';
 
 const PASSWORD_REGEX =
   /^(?=.*[a-z])(?=.*[A-Z])(?=(?:.*\d){4,})(?=.*[^a-zA-Z0-9]).{8,}$/;
@@ -25,6 +28,7 @@ export class AuthService {
     private readonly messagingService: MessagingService,
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
+    private readonly configService: ConfigService,
   ) {}
 
   async register(dto: RegisterDto) {
@@ -189,6 +193,60 @@ export class AuthService {
         level: user.level,
       },
     };
+  }
+
+  async forgotPassword(dto: ForgotPasswordDto) {
+    const user = await this.prisma.userAccount.findUnique({
+      where: { email: dto.email },
+    });
+
+    if (user) {
+      const token = this.jwtService.sign(
+        { sub: user.id, type: 'password-reset' },
+        { expiresIn: '1h' },
+      );
+
+      await this.messagingService.publish('email-send', {
+        email: user.email,
+        name: user.name,
+        token,
+        type: 'password-reset',
+      });
+    }
+
+    return { message: 'If the email exists, a password reset link was sent.' };
+  }
+
+  async resetPassword(dto: ResetPasswordDto) {
+    if (!PASSWORD_REGEX.test(dto.password)) {
+      throw new BadRequestException(
+        'Password must have at least 8 characters, 1 uppercase, 1 lowercase, 4 numbers and 1 special character',
+      );
+    }
+
+    let payload: { sub: string; type: string };
+    try {
+      payload = this.jwtService.verify<{ sub: string; type: string }>(
+        dto.token,
+        { secret: this.configService.get<string>('JWT_SECRET') },
+      );
+    } catch {
+      throw new BadRequestException('Invalid or expired reset token');
+    }
+
+    if (payload.type !== 'password-reset') {
+      throw new BadRequestException('Invalid or expired reset token');
+    }
+
+    const saltRounds = parseInt(this.configService.get<string>('BCRYPT_SALT_ROUNDS', '10'), 10);
+    const hashedPassword = await bcrypt.hash(dto.password, saltRounds);
+
+    await this.prisma.userAccount.update({
+      where: { id: payload.sub },
+      data: { password: hashedPassword },
+    });
+
+    return { message: 'Password reset successfully' };
   }
 
   async getMe(userId: string) {

@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
+import { ConfigService } from '@nestjs/config';
 import { AuthService } from './auth.service';
 import { UserService } from '../user/user.service';
 import { MessagingService } from '../messaging/messaging.service';
@@ -58,6 +59,17 @@ const mockMessagingService = {
 
 const mockJwtService = {
   sign: jest.fn().mockReturnValue('signed-jwt-token'),
+  verify: jest.fn(),
+};
+
+const mockConfigService = {
+  get: jest.fn((key: string, defaultValue?: unknown) => {
+    const config: Record<string, unknown> = {
+      JWT_SECRET: 'test-secret',
+      BCRYPT_SALT_ROUNDS: 10,
+    };
+    return config[key] ?? defaultValue;
+  }),
 };
 
 const mockPrismaService = {
@@ -88,6 +100,7 @@ describe('AuthService', () => {
         { provide: MessagingService, useValue: mockMessagingService },
         { provide: PrismaService, useValue: mockPrismaService },
         { provide: JwtService, useValue: mockJwtService },
+        { provide: ConfigService, useValue: mockConfigService },
       ],
     }).compile();
 
@@ -345,6 +358,96 @@ describe('AuthService', () => {
       (bcrypt.compare as jest.Mock).mockResolvedValue(true);
 
       await expect(service.login(loginDto)).rejects.toThrow(ForbiddenException);
+    });
+  });
+
+  describe('forgotPassword', () => {
+    it('should publish reset token to RabbitMQ when email exists', async () => {
+      mockPrismaService.userAccount.findUnique.mockResolvedValue(fullMockUser);
+
+      const result = await service.forgotPassword({ email: 'joao@ufba.br' });
+
+      expect(mockJwtService.sign).toHaveBeenCalledWith(
+        { sub: 'uuid-1', type: 'password-reset' },
+        { expiresIn: '1h' },
+      );
+      expect(mockMessagingService.publish).toHaveBeenCalledWith(
+        'email-send',
+        expect.objectContaining({
+          email: 'joao@ufba.br',
+          type: 'password-reset',
+        }),
+      );
+      expect(result).toHaveProperty('message');
+    });
+
+    it('should return same message when email does not exist (no leak)', async () => {
+      mockPrismaService.userAccount.findUnique.mockResolvedValue(null);
+
+      const result = await service.forgotPassword({
+        email: 'nonexistent@ufba.br',
+      });
+
+      expect(mockMessagingService.publish).not.toHaveBeenCalled();
+      expect(result).toHaveProperty('message');
+    });
+  });
+
+  describe('resetPassword', () => {
+    it('should reset password with valid token', async () => {
+      mockJwtService.verify.mockReturnValue({
+        sub: 'uuid-1',
+        type: 'password-reset',
+      });
+      (bcrypt.hash as jest.Mock).mockResolvedValue('$2b$10$newhashedpassword');
+
+      const result = await service.resetPassword({
+        token: 'valid-reset-token',
+        password: 'NewPass1234!',
+      });
+
+      expect(mockJwtService.verify).toHaveBeenCalledWith('valid-reset-token', {
+        secret: 'test-secret',
+      });
+      expect(mockPrismaService.userAccount.update).toHaveBeenCalledWith({
+        where: { id: 'uuid-1' },
+        data: { password: '$2b$10$newhashedpassword' },
+      });
+      expect(result).toHaveProperty('message', 'Password reset successfully');
+    });
+
+    it('should throw BadRequestException on invalid token', async () => {
+      mockJwtService.verify.mockImplementation(() => {
+        throw new Error('invalid token');
+      });
+
+      await expect(
+        service.resetPassword({
+          token: 'invalid-token',
+          password: 'NewPass1234!',
+        }),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('should throw BadRequestException on wrong token type', async () => {
+      mockJwtService.verify.mockReturnValue({
+        sub: 'uuid-1',
+        type: 'email-verification',
+      });
+
+      await expect(
+        service.resetPassword({
+          token: 'wrong-type-token',
+          password: 'NewPass1234!',
+        }),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('should throw BadRequestException on weak password', async () => {
+      await expect(
+        service.resetPassword({ token: 'valid-token', password: 'weak' }),
+      ).rejects.toThrow(BadRequestException);
+      expect(mockJwtService.verify).not.toHaveBeenCalled();
     });
   });
 
