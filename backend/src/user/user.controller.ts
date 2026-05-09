@@ -8,9 +8,11 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
+import { UserLevel } from '@prisma/client';
 import { UserService } from './user.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UpdateLevelDto } from './dto/update-level.dto';
+import { CurrentUser } from '../common/decorators/current-user.decorator';
 
 @Controller('users')
 export class UserController {
@@ -59,8 +61,16 @@ export class UserController {
   }
 
   @Patch(':id/level')
-  async updateLevel(@Param('id') id: string, @Body() dto: UpdateLevelDto) {
-    const data = await this.userService.updateLevel(id, dto.level);
+  async updateLevel(
+    @Param('id') id: string,
+    @Body() dto: UpdateLevelDto,
+    @CurrentUser() caller: { sub: string; level: UserLevel },
+  ) {
+    const data = await this.userService.updateLevel(
+      id,
+      dto.level,
+      caller.level,
+    );
     return { data, message: 'User level updated successfully' };
   }
 }

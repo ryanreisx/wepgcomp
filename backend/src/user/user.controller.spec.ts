@@ -148,13 +148,16 @@ describe('UserController', () => {
   });
 
   describe('PATCH /users/:id/level', () => {
-    it('should update user level', async () => {
+    it('should update user level passing caller level', async () => {
       const updatedUser = { ...mockUser, level: UserLevel.Admin };
       mockUserService.updateLevel.mockResolvedValue(updatedUser);
 
-      const result = await controller.updateLevel('uuid-1', {
-        level: UserLevel.Admin,
-      });
+      const caller = { sub: 'caller-1', level: UserLevel.Superadmin };
+      const result = await controller.updateLevel(
+        'uuid-1',
+        { level: UserLevel.Admin },
+        caller,
+      );
 
       expect(result).toEqual({
         data: updatedUser,
@@ -163,6 +166,7 @@ describe('UserController', () => {
       expect(mockUserService.updateLevel).toHaveBeenCalledWith(
         'uuid-1',
         UserLevel.Admin,
+        UserLevel.Superadmin,
       );
     });
   });

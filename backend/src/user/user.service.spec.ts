@@ -1,5 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { ConflictException, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  ForbiddenException,
+  NotFoundException,
+} from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { UserService } from './user.service';
 import { UserRepository } from './user.repository';
@@ -237,26 +242,105 @@ describe('UserService', () => {
   });
 
   describe('updateLevel', () => {
-    it('should update user level', async () => {
+    it('should allow Admin to promote user to Admin', async () => {
       mockRepository.findById.mockResolvedValue(mockUser);
       mockRepository.update.mockResolvedValue({
         ...mockUser,
+        level: UserLevel.Admin,
+      });
+
+      const result = await service.updateLevel(
+        'uuid-1',
+        UserLevel.Admin,
+        UserLevel.Admin,
+      );
+
+      expect(result.level).toBe(UserLevel.Admin);
+      expect(mockRepository.update).toHaveBeenCalledWith('uuid-1', {
+        level: UserLevel.Admin,
+      });
+    });
+
+    it('should allow Superadmin to promote user to Admin', async () => {
+      mockRepository.findById.mockResolvedValue(mockUser);
+      mockRepository.update.mockResolvedValue({
+        ...mockUser,
+        level: UserLevel.Admin,
+      });
+
+      const result = await service.updateLevel(
+        'uuid-1',
+        UserLevel.Admin,
+        UserLevel.Superadmin,
+      );
+
+      expect(result.level).toBe(UserLevel.Admin);
+    });
+
+    it('should throw ForbiddenException when Admin tries to promote to Superadmin', async () => {
+      const professorUser = { ...mockUser, profile: Profile.Professor };
+      mockRepository.findById.mockResolvedValue(professorUser);
+
+      await expect(
+        service.updateLevel('uuid-1', UserLevel.Superadmin, UserLevel.Admin),
+      ).rejects.toThrow(ForbiddenException);
+    });
+
+    it('should allow Superadmin to promote Professor to Superadmin', async () => {
+      const professorUser = { ...mockUser, profile: Profile.Professor };
+      mockRepository.findById.mockResolvedValue(professorUser);
+      mockRepository.update.mockResolvedValue({
+        ...professorUser,
         level: UserLevel.Superadmin,
       });
 
-      const result = await service.updateLevel('uuid-1', UserLevel.Superadmin);
+      const result = await service.updateLevel(
+        'uuid-1',
+        UserLevel.Superadmin,
+        UserLevel.Superadmin,
+      );
 
       expect(result.level).toBe(UserLevel.Superadmin);
-      expect(mockRepository.update).toHaveBeenCalledWith('uuid-1', {
-        level: UserLevel.Superadmin,
-      });
+    });
+
+    it('should throw BadRequestException when promoting non-Professor to Superadmin', async () => {
+      mockRepository.findById.mockResolvedValue(mockUser);
+
+      await expect(
+        service.updateLevel(
+          'uuid-1',
+          UserLevel.Superadmin,
+          UserLevel.Superadmin,
+        ),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('should throw BadRequestException when promoting Listener to Superadmin', async () => {
+      const listenerUser = { ...mockUser, profile: Profile.Listener };
+      mockRepository.findById.mockResolvedValue(listenerUser);
+
+      await expect(
+        service.updateLevel(
+          'uuid-1',
+          UserLevel.Superadmin,
+          UserLevel.Superadmin,
+        ),
+      ).rejects.toThrow(BadRequestException);
+    });
+
+    it('should throw ForbiddenException when Default tries to assign any level', async () => {
+      mockRepository.findById.mockResolvedValue(mockUser);
+
+      await expect(
+        service.updateLevel('uuid-1', UserLevel.Admin, UserLevel.Default),
+      ).rejects.toThrow(ForbiddenException);
     });
 
     it('should throw NotFoundException when user not found', async () => {
       mockRepository.findById.mockResolvedValue(null);
 
       await expect(
-        service.updateLevel('nonexistent', UserLevel.Admin),
+        service.updateLevel('nonexistent', UserLevel.Admin, UserLevel.Admin),
       ).rejects.toThrow(NotFoundException);
     });
   });

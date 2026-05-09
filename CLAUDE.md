@@ -177,6 +177,8 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
 
 3. **`ConfigService.get()` retorna string para variáveis numéricas.** Variáveis de ambiente são sempre strings. `configService.get<number>('BCRYPT_SALT_ROUNDS', 10)` retorna `"10"` (string), não `10` (number), o que causa erro em funções que esperam número (ex: `bcrypt.hash`). Sempre usar `parseInt(this.configService.get<string>('BCRYPT_SALT_ROUNDS', '10'), 10)` para variáveis numéricas.
 
+4. **Alterar assinatura de um Service exige atualizar o Controller e seus testes.** Ao adicionar parâmetros a métodos do Service (ex: `updateLevel(id, level)` → `updateLevel(id, level, callerLevel)`), o Controller que chama esse método e o `*.controller.spec.ts` correspondente também precisam ser atualizados na mesma task. Sempre verificar os chamadores antes de alterar assinaturas.
+
 ---
 
 ## 5. Convenções de Código — Frontend

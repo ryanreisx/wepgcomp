@@ -1,5 +1,7 @@
 import {
+  BadRequestException,
   ConflictException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -81,8 +83,30 @@ export class UserService {
     return this.userRepository.update(id, { isVerified: false });
   }
 
-  async updateLevel(id: string, level: UserLevel): Promise<UserAccount> {
-    await this.findById(id);
-    return this.userRepository.update(id, { level });
+  async updateLevel(
+    id: string,
+    newLevel: UserLevel,
+    callerLevel: UserLevel,
+  ): Promise<UserAccount> {
+    if (callerLevel === UserLevel.Default) {
+      throw new ForbiddenException('Insufficient level to assign roles');
+    }
+
+    const targetUser = await this.findById(id);
+
+    if (newLevel === UserLevel.Superadmin) {
+      if (callerLevel !== UserLevel.Superadmin) {
+        throw new ForbiddenException(
+          'Only Superadmin can promote to Superadmin',
+        );
+      }
+      if (targetUser.profile !== Profile.Professor) {
+        throw new BadRequestException(
+          'Only professors can be promoted to Superadmin',
+        );
+      }
+    }
+
+    return this.userRepository.update(id, { level: newLevel });
   }
 }

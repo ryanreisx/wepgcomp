@@ -238,7 +238,10 @@ export class AuthService {
       throw new BadRequestException('Invalid or expired reset token');
     }
 
-    const saltRounds = parseInt(this.configService.get<string>('BCRYPT_SALT_ROUNDS', '10'), 10);
+    const saltRounds = parseInt(
+      this.configService.get<string>('BCRYPT_SALT_ROUNDS', '10'),
+      10,
+    );
     const hashedPassword = await bcrypt.hash(dto.password, saltRounds);
 
     await this.prisma.userAccount.update({
