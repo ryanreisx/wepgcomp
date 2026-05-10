@@ -705,7 +705,7 @@ Adicionar `cookie-parser` e `@types/cookie-parser` às dependências.
 
 ---
 
-## T-2.14: Módulo Presentation — Repository, Service e Controller
+## T-2.14: Módulo Presentation — Repository, Service e Controller ✅
 
 **Descrição**: Gestão da alocação de submissões em blocos.
 
