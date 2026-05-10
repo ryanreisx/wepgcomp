@@ -11,6 +11,7 @@ import { RoomModule } from './room/room.module';
 import { GuidanceModule } from './guidance/guidance.module';
 import { CommitteeModule } from './committee/committee.module';
 import { SubmissionModule } from './submission/submission.module';
+import { PresentationModule } from './presentation/presentation.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { SubmissionModule } from './submission/submission.module';
     GuidanceModule,
     CommitteeModule,
     SubmissionModule,
+    PresentationModule,
   ],
   controllers: [AppController],
   providers: [AppService],

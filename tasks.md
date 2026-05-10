@@ -671,7 +671,7 @@ Adicionar `cookie-parser` e `@types/cookie-parser` às dependências.
 
 ---
 
-## T-2.13: Módulo PresentationBlock — Repository, Service e Controller
+## T-2.13: Módulo PresentationBlock — Repository, Service e Controller ✅
 
 **Descrição**: CRUD de blocos/sessões de apresentação.
 
