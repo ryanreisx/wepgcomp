@@ -9,6 +9,7 @@ import { AuthModule } from './auth/auth.module';
 import { EventEditionModule } from './event-edition/event-edition.module';
 import { RoomModule } from './room/room.module';
 import { GuidanceModule } from './guidance/guidance.module';
+import { CommitteeModule } from './committee/committee.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { GuidanceModule } from './guidance/guidance.module';
     EventEditionModule,
     RoomModule,
     GuidanceModule,
+    CommitteeModule,
   ],
   controllers: [AppController],
   providers: [AppService],
