@@ -7,6 +7,7 @@ import { MessagingModule } from './messaging/messaging.module';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { EventEditionModule } from './event-edition/event-edition.module';
+import { RoomModule } from './room/room.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { EventEditionModule } from './event-edition/event-edition.module';
     UserModule,
     AuthModule,
     EventEditionModule,
+    RoomModule,
   ],
   controllers: [AppController],
   providers: [AppService],
