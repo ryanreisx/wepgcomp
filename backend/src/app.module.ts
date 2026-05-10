@@ -8,6 +8,7 @@ import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { EventEditionModule } from './event-edition/event-edition.module';
 import { RoomModule } from './room/room.module';
+import { GuidanceModule } from './guidance/guidance.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { RoomModule } from './room/room.module';
     AuthModule,
     EventEditionModule,
     RoomModule,
+    GuidanceModule,
   ],
   controllers: [AppController],
   providers: [AppService],
