@@ -6,6 +6,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { MessagingModule } from './messaging/messaging.module';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
+import { EventEditionModule } from './event-edition/event-edition.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { AuthModule } from './auth/auth.module';
     MessagingModule,
     UserModule,
     AuthModule,
+    EventEditionModule,
   ],
   controllers: [AppController],
   providers: [AppService],
