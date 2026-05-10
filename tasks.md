@@ -635,7 +635,7 @@ Adicionar `cookie-parser` e `@types/cookie-parser` às dependências.
 
 ---
 
-## T-2.12: Módulo Submission — Repository, Service e Controller
+## T-2.12: Módulo Submission — Repository, Service e Controller ✅
 
 **Descrição**: CRUD de submissões de apresentações.
 

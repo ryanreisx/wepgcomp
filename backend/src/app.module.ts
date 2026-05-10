@@ -10,6 +10,7 @@ import { EventEditionModule } from './event-edition/event-edition.module';
 import { RoomModule } from './room/room.module';
 import { GuidanceModule } from './guidance/guidance.module';
 import { CommitteeModule } from './committee/committee.module';
+import { SubmissionModule } from './submission/submission.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { CommitteeModule } from './committee/committee.module';
     RoomModule,
     GuidanceModule,
     CommitteeModule,
+    SubmissionModule,
   ],
   controllers: [AppController],
   providers: [AppService],
