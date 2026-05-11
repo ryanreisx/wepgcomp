@@ -29,6 +29,19 @@ export class PresentationController {
     return { data, message: 'Presentation allocated successfully' };
   }
 
+  @Get('ranking')
+  @Public()
+  async getRanking(
+    @Query('eventEditionId') eventEditionId: string,
+    @Query('type') type: 'public' | 'panelists' | 'all',
+  ) {
+    const data = await this.presentationService.getRanking(
+      eventEditionId,
+      type,
+    );
+    return { data };
+  }
+
   @Get()
   @Public()
   async findByEdition(@Query('eventEditionId') eventEditionId: string) {

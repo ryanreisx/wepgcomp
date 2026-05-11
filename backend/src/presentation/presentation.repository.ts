@@ -1,9 +1,27 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { Prisma, Presentation, Submission } from '@prisma/client';
+import {
+  Prisma,
+  Presentation,
+  Submission,
+  Evaluation,
+  UserAccount,
+  Panelist,
+  PresentationBlock,
+} from '@prisma/client';
 
 export type PresentationWithSubmission = Presentation & {
   submission: Submission;
+};
+
+export type PresentationWithEvaluationData = Presentation & {
+  submission: Submission & {
+    mainAuthor: Pick<UserAccount, 'name'>;
+    evaluations: Evaluation[];
+  };
+  presentationBlock: PresentationBlock & {
+    panelists: Pick<Panelist, 'userId'>[];
+  };
 };
 
 @Injectable()
@@ -50,5 +68,37 @@ export class PresentationRepository {
       select: { id: true },
     });
     return !!submission;
+  }
+
+  async findByEditionWithEvaluations(
+    eventEditionId: string,
+  ): Promise<PresentationWithEvaluationData[]> {
+    return this.prisma.presentation.findMany({
+      where: { presentationBlock: { eventEditionId } },
+      include: {
+        submission: {
+          include: {
+            mainAuthor: { select: { name: true } },
+            evaluations: true,
+          },
+        },
+        presentationBlock: {
+          include: {
+            panelists: { select: { userId: true } },
+          },
+        },
+      },
+    });
+  }
+
+  async updateScores(
+    id: string,
+    publicAverageScore: number,
+    evaluatorsAverageScore: number,
+  ): Promise<Presentation> {
+    return this.prisma.presentation.update({
+      where: { id },
+      data: { publicAverageScore, evaluatorsAverageScore },
+    });
   }
 }

@@ -58,6 +58,8 @@ const mockRepository = {
   update: jest.fn(),
   delete: jest.fn(),
   submissionExists: jest.fn(),
+  findByEditionWithEvaluations: jest.fn(),
+  updateScores: jest.fn(),
 };
 
 const mockPresentationBlockService = {
@@ -253,6 +255,278 @@ describe('PresentationService', () => {
       await expect(service.delete('nonexistent')).rejects.toThrow(
         NotFoundException,
       );
+    });
+  });
+
+  describe('getRanking', () => {
+    const makeEval = (id: string, userId: string | null, score: number) => ({
+      id,
+      userId,
+      evaluationCriteriaId: 'criteria-1',
+      submissionId: 'sub-1',
+      score,
+      comments: null,
+      name: null,
+      email: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+
+    const makePresWithEvals = (
+      id: string,
+      submissionId: string,
+      title: string,
+      authorName: string,
+      evaluations: ReturnType<typeof makeEval>[],
+      panelistUserIds: string[] = [],
+    ) => ({
+      id,
+      submissionId,
+      presentationBlockId: 'block-1',
+      positionWithinBlock: 0,
+      status: PresentationStatus.Scheduled,
+      publicAverageScore: null,
+      evaluatorsAverageScore: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      submission: {
+        id: submissionId,
+        title,
+        mainAuthor: { name: authorName },
+        evaluations,
+        advisorId: 'advisor-1',
+        mainAuthorId: 'author-1',
+        eventEditionId: 'edition-1',
+        pdfFile: 'test.pdf',
+        phoneNumber: '71999999999',
+        proposedPresentationBlockId: null,
+        proposedPositionWithinBlock: null,
+        coAdvisor: null,
+        status: 'Submitted',
+        abstract: 'Abstract',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      presentationBlock: {
+        id: 'block-1',
+        eventEditionId: 'edition-1',
+        roomId: 'room-1',
+        type: 'Presentation',
+        title: 'Session 1',
+        speakerName: null,
+        startTime: new Date(),
+        duration: 60,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        panelists: panelistUserIds.map((userId) => ({ userId })),
+      },
+    });
+
+    it('should return ranking with 5 presentations sorted by nota_final desc (type=all)', async () => {
+      const presentations = [
+        makePresWithEvals('p1', 's1', 'Paper A', 'Author A', [
+          makeEval('e1', 'u1', 4),
+          makeEval('e2', 'u2', 2),
+        ]),
+        makePresWithEvals('p2', 's2', 'Paper B', 'Author B', [
+          makeEval('e3', 'u1', 5),
+          makeEval('e4', 'u2', 5),
+          makeEval('e5', 'u3', 5),
+        ]),
+        makePresWithEvals('p3', 's3', 'Paper C', 'Author C', [
+          makeEval('e6', 'u1', 1),
+        ]),
+        makePresWithEvals('p4', 's4', 'Paper D', 'Author D', [
+          makeEval('e7', 'u1', 3),
+          makeEval('e8', 'u2', 3),
+          makeEval('e9', 'u3', 3),
+          makeEval('e10', 'u4', 3),
+        ]),
+        makePresWithEvals('p5', 's5', 'Paper E', 'Author E', [
+          makeEval('e11', 'u1', 4),
+          makeEval('e12', 'u2', 4),
+          makeEval('e13', 'u3', 4),
+          makeEval('e14', 'u4', 4),
+          makeEval('e15', 'u5', 4),
+        ]),
+      ];
+
+      mockRepository.findByEditionWithEvaluations.mockResolvedValue(
+        presentations,
+      );
+      mockRepository.updateScores.mockResolvedValue({});
+
+      const result = await service.getRanking('edition-1', 'all');
+
+      expect(result).toHaveLength(5);
+      // Paper E: avg=4, count=5, nota=(4+5)/2=4.5
+      expect(result[0].title).toBe('Paper E');
+      expect(result[0].averageScore).toBe(4.5);
+      // Paper B: avg=5, count=3, nota=(5+3)/2=4
+      expect(result[1].title).toBe('Paper B');
+      expect(result[1].averageScore).toBe(4);
+      // Paper D: avg=3, count=4, nota=(3+4)/2=3.5
+      expect(result[2].title).toBe('Paper D');
+      expect(result[2].averageScore).toBe(3.5);
+      // Paper A: avg=3, count=2, nota=(3+2)/2=2.5
+      expect(result[3].title).toBe('Paper A');
+      expect(result[3].averageScore).toBe(2.5);
+      // Paper C: avg=1, count=1, nota=(1+1)/2=1
+      expect(result[4].title).toBe('Paper C');
+      expect(result[4].averageScore).toBe(1);
+    });
+
+    it('should handle tie in nota_final', async () => {
+      const presentations = [
+        makePresWithEvals('p1', 's1', 'Paper A', 'Author A', [
+          makeEval('e1', 'u1', 4),
+          makeEval('e2', 'u2', 4),
+        ]),
+        makePresWithEvals('p2', 's2', 'Paper B', 'Author B', [
+          makeEval('e3', 'u1', 4),
+          makeEval('e4', 'u2', 4),
+        ]),
+      ];
+
+      mockRepository.findByEditionWithEvaluations.mockResolvedValue(
+        presentations,
+      );
+      mockRepository.updateScores.mockResolvedValue({});
+
+      const result = await service.getRanking('edition-1', 'all');
+
+      expect(result).toHaveLength(2);
+      // Both: avg=4, count=2, nota=(4+2)/2=3
+      expect(result[0].averageScore).toBe(3);
+      expect(result[1].averageScore).toBe(3);
+    });
+
+    it('should return empty list when edition has no evaluations', async () => {
+      const presentations = [
+        makePresWithEvals('p1', 's1', 'Paper A', 'Author A', []),
+        makePresWithEvals('p2', 's2', 'Paper B', 'Author B', []),
+      ];
+
+      mockRepository.findByEditionWithEvaluations.mockResolvedValue(
+        presentations,
+      );
+      mockRepository.updateScores.mockResolvedValue({});
+
+      const result = await service.getRanking('edition-1', 'all');
+
+      expect(result).toHaveLength(2);
+      expect(result[0].averageScore).toBe(0);
+      expect(result[1].averageScore).toBe(0);
+    });
+
+    it('should return empty list when no presentations exist', async () => {
+      mockRepository.findByEditionWithEvaluations.mockResolvedValue([]);
+
+      const result = await service.getRanking('edition-1', 'all');
+
+      expect(result).toHaveLength(0);
+    });
+
+    it('should filter to public evaluations only (type=public)', async () => {
+      const presentations = [
+        makePresWithEvals(
+          'p1',
+          's1',
+          'Paper A',
+          'Author A',
+          [
+            makeEval('e1', 'panelist-1', 5),
+            makeEval('e2', 'public-1', 2),
+            makeEval('e3', 'public-2', 2),
+          ],
+          ['panelist-1'],
+        ),
+      ];
+
+      mockRepository.findByEditionWithEvaluations.mockResolvedValue(
+        presentations,
+      );
+      mockRepository.updateScores.mockResolvedValue({});
+
+      const result = await service.getRanking('edition-1', 'public');
+
+      // Public only: scores [2, 2], avg=2, count=2, nota=(2+2)/2=2
+      expect(result[0].averageScore).toBe(2);
+    });
+
+    it('should filter to panelist evaluations only (type=panelists)', async () => {
+      const presentations = [
+        makePresWithEvals(
+          'p1',
+          's1',
+          'Paper A',
+          'Author A',
+          [
+            makeEval('e1', 'panelist-1', 5),
+            makeEval('e2', 'panelist-2', 5),
+            makeEval('e3', 'public-1', 1),
+          ],
+          ['panelist-1', 'panelist-2'],
+        ),
+      ];
+
+      mockRepository.findByEditionWithEvaluations.mockResolvedValue(
+        presentations,
+      );
+      mockRepository.updateScores.mockResolvedValue({});
+
+      const result = await service.getRanking('edition-1', 'panelists');
+
+      // Panelists only: scores [5, 5], avg=5, count=2, nota=(5+2)/2=3.5
+      expect(result[0].averageScore).toBe(3.5);
+    });
+
+    it('should include anonymous evaluations in public ranking', async () => {
+      const presentations = [
+        makePresWithEvals(
+          'p1',
+          's1',
+          'Paper A',
+          'Author A',
+          [makeEval('e1', null, 3), makeEval('e2', 'public-1', 3)],
+          ['panelist-1'],
+        ),
+      ];
+
+      mockRepository.findByEditionWithEvaluations.mockResolvedValue(
+        presentations,
+      );
+      mockRepository.updateScores.mockResolvedValue({});
+
+      const result = await service.getRanking('edition-1', 'public');
+
+      // Anonymous (null userId) should be included in public: scores [3, 3]
+      // avg=3, count=2, nota=(3+2)/2=2.5
+      expect(result[0].averageScore).toBe(2.5);
+    });
+
+    it('should update publicAverageScore and evaluatorsAverageScore', async () => {
+      const presentations = [
+        makePresWithEvals(
+          'p1',
+          's1',
+          'Paper A',
+          'Author A',
+          [makeEval('e1', 'panelist-1', 5), makeEval('e2', 'public-1', 3)],
+          ['panelist-1'],
+        ),
+      ];
+
+      mockRepository.findByEditionWithEvaluations.mockResolvedValue(
+        presentations,
+      );
+      mockRepository.updateScores.mockResolvedValue({});
+
+      await service.getRanking('edition-1', 'all');
+
+      // Public: score [3], avg=3, count=1, nota=(3+1)/2=2
+      // Panelists: score [5], avg=5, count=1, nota=(5+1)/2=3
+      expect(mockRepository.updateScores).toHaveBeenCalledWith('p1', 2, 3);
     });
   });
 });
