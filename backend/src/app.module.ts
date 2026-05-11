@@ -12,6 +12,7 @@ import { GuidanceModule } from './guidance/guidance.module';
 import { CommitteeModule } from './committee/committee.module';
 import { SubmissionModule } from './submission/submission.module';
 import { PresentationModule } from './presentation/presentation.module';
+import { EvaluationModule } from './evaluation/evaluation.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { PresentationModule } from './presentation/presentation.module';
     CommitteeModule,
     SubmissionModule,
     PresentationModule,
+    EvaluationModule,
   ],
   controllers: [AppController],
   providers: [AppService],
