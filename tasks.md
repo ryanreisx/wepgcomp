@@ -736,7 +736,7 @@ Adicionar `cookie-parser` e `@types/cookie-parser` às dependências.
 
 ---
 
-## T-2.15: Módulo Panelist — Repository, Service e Controller
+## T-2.15: Módulo Panelist — Repository, Service e Controller ✅
 
 **Descrição**: Gestão de avaliadores por bloco de apresentação.
 
