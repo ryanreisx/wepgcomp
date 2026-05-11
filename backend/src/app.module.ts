@@ -13,6 +13,7 @@ import { CommitteeModule } from './committee/committee.module';
 import { SubmissionModule } from './submission/submission.module';
 import { PresentationModule } from './presentation/presentation.module';
 import { EvaluationModule } from './evaluation/evaluation.module';
+import { CertificateModule } from './certificate/certificate.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { EvaluationModule } from './evaluation/evaluation.module';
     SubmissionModule,
     PresentationModule,
     EvaluationModule,
+    CertificateModule,
   ],
   controllers: [AppController],
   providers: [AppService],
