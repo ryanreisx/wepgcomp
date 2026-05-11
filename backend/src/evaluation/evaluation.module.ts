@@ -6,9 +6,10 @@ import { EvaluationCriteriaController } from './evaluation-criteria.controller';
 import { EvaluationCriteriaService } from './evaluation-criteria.service';
 import { EvaluationCriteriaRepository } from './evaluation-criteria.repository';
 import { EventEditionModule } from '../event-edition/event-edition.module';
+import { SubmissionModule } from '../submission/submission.module';
 
 @Module({
-  imports: [EventEditionModule],
+  imports: [EventEditionModule, SubmissionModule],
   controllers: [EvaluationController, EvaluationCriteriaController],
   providers: [
     EvaluationService,
