@@ -9,6 +9,9 @@ import { PresentationBlockRepository } from './presentation-block.repository';
 import { PanelistController } from './panelist.controller';
 import { PanelistService } from './panelist.service';
 import { PanelistRepository } from './panelist.repository';
+import { AwardedPanelistController } from './awarded-panelist.controller';
+import { AwardedPanelistService } from './awarded-panelist.service';
+import { AwardedPanelistRepository } from './awarded-panelist.repository';
 
 @Module({
   imports: [EventEditionModule],
@@ -16,6 +19,7 @@ import { PanelistRepository } from './panelist.repository';
     PresentationController,
     PresentationBlockController,
     PanelistController,
+    AwardedPanelistController,
   ],
   providers: [
     PresentationService,
@@ -24,6 +28,8 @@ import { PanelistRepository } from './panelist.repository';
     PresentationBlockRepository,
     PanelistService,
     PanelistRepository,
+    AwardedPanelistService,
+    AwardedPanelistRepository,
   ],
   exports: [PresentationService, PresentationBlockService],
 })
