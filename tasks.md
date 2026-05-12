@@ -1049,7 +1049,7 @@ Esses critérios não são fixos no código — são registros normais da tabela
 - 8 apresentações alocadas em blocos do tipo Presentation.
 - 3 painelistas (`Panelist`) atribuídos aos blocos de apresentações, sendo professores ativos.
 - 1 Guidance vinculada à edição com texto para autores, avaliadores e audiência.
-- 4 favoritos (`Favorite`): cada um dos 2 ouvintes favorita 2 submissões diferentes — útil para validar a tela de Avaliação com favoritos integrada (T-3.14).
+- 4 bookmarks: cada um dos 2 ouvintes bookmarká 2 apresentações diferentes usando `prisma.presentation.update({ bookmarkedUsers: { connect } })` — útil para validar a tela de Avaliação com bookmarks integrada (T-3.14).
 
 **Critérios de aceitação**:
 - `npx prisma db seed` executa sem erro.
