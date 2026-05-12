@@ -172,29 +172,35 @@ enum UserLevel {
 
 enum SubmissionStatus {
   Submitted
-  UnderReview
-  Accepted
+  Confirmed
   Rejected
-  Withdrawn
+
+  @@map("submission_status")
 }
 
 enum PresentationBlockType {
+  General
   Presentation
-  Keynote
-  Break
-  Other
+
+  @@map("presentation_block_type")
 }
 
 enum PresentationStatus {
-  Scheduled
-  Completed
-  Cancelled
+  ToPresent
+  Presented
+  NotPresented
+
+  @@map("presentation_status")
 }
 
 enum PanelistStatus {
-  Confirmed
-  Declined
   Pending
+  Confirmed
+  Rejected
+  Present
+  Missing
+
+  @@map("panelist_status")
 }
 
 enum CommitteeLevel {
@@ -205,9 +211,21 @@ enum CommitteeLevel {
 }
 
 enum CommitteeRole {
-  Organizer
-  Reviewer
-  Evaluator
+  OrganizingCommittee
+  StudentVolunteers
+  AdministativeSupport
+  Communication
+  ITSupport
+
+  @@map("committee_role")
+}
+
+enum AdminApprovalStatus {
+  Pending
+  Approved
+  Rejected
+
+  @@map("admin_approval_status")
 }
 ```
 
@@ -236,7 +254,7 @@ model UserAccount {
   awardedPanelists   AwardedPanelist[]
   committeeMembers   CommitteeMember[]
   certificates       Certificate[]
-  favorites          Favorite[]
+  bookmarkedPresentations Presentation[]
 }
 
 model EmailVerification {
@@ -301,7 +319,6 @@ model Submission {
   proposedPresentationBlock  PresentationBlock? @relation("ProposedBlock", fields: [proposedPresentationBlockId], references: [id])
   evaluations                Evaluation[]
   presentation               Presentation?
-  favorites                  Favorite[]
 }
 
 model EvaluationCriteria {
@@ -367,17 +384,18 @@ model PresentationBlock {
 
 model Presentation {
   id                     String             @id @default(uuid())
-  submissionId           String             @unique
-  presentationBlockId    String
-  positionWithinBlock    Int
-  status                 PresentationStatus @default(Scheduled)
-  publicAverageScore     Float?
-  evaluatorsAverageScore Float?
-  createdAt              DateTime           @default(now())
-  updatedAt              DateTime           @updatedAt
+  submissionId           String             @unique @map("submission_id")
+  presentationBlockId    String             @map("presentation_block_id")
+  positionWithinBlock    Int                @map("position_within_block")
+  status                 PresentationStatus
+  publicAverageScore     Float?             @map("public_average_score")
+  evaluatorsAverageScore Float?             @map("evaluators_average_score")
+  createdAt              DateTime           @default(now()) @map("created_at")
+  updatedAt              DateTime           @updatedAt @map("updated_at")
 
   submission        Submission        @relation(fields: [submissionId], references: [id])
   presentationBlock PresentationBlock @relation(fields: [presentationBlockId], references: [id])
+  bookmarkedUsers   UserAccount[]
 }
 
 model Panelist {
@@ -445,20 +463,9 @@ model Guidance {
   eventEdition EventEdition @relation(fields: [eventEditionId], references: [id])
 }
 
-model Favorite {
-  userId       String
-  submissionId String
-  createdAt    DateTime @default(now())
-
-  user       UserAccount @relation(fields: [userId], references: [id], onDelete: Cascade)
-  submission Submission  @relation(fields: [submissionId], references: [id], onDelete: Cascade)
-
-  @@id([userId, submissionId])
-  @@map("favorite")
-}
 ```
 
-> **Nota sobre Favorite**: este modelo dá suporte ao recurso de favoritar apresentações na Visão Ouvinte/Logado (T-3.14). Trata-se de uma relação muitos-para-muitos entre `UserAccount` e `Submission`, com chave primária composta. A operação semântica é binária (favoritado ou não), persistida no servidor para que o usuário recupere a lista após login em qualquer dispositivo.
+> **Nota sobre Bookmarks**: o recurso de favoritar apresentações na Visão Ouvinte/Logado (T-3.14) usa a relação implícita many-to-many `bookmarkedPresentations` ↔ `bookmarkedUsers` entre `UserAccount` e `Presentation`. Não existe model `Favorite` explícito — o Prisma gerencia a tabela de junção automaticamente.
 
 ---
 
@@ -650,7 +657,7 @@ DELETE /api/v1/{recurso}/:id      → remover
 | Certificados | `/api/v1/certificates` |
 | Orientações | `/api/v1/guidances` |
 | Contato | `/api/v1/contact` |
-| Favoritos | `/api/v1/favorites` |
+| Favoritos (bookmarks) | `/api/v1/presentations/:id/bookmark` |
 | Arquivos (upload/download) | `/api/v1/files` |
 
 ### 9.3. Formato de Resposta

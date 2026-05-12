@@ -60,7 +60,7 @@ Estas regras se aplicam a **todas** as tasks, sem exceção:
 
 7. **Prisma é a fonte de verdade do schema.** Qualquer mudança no modelo de dados começa no `schema.prisma`, gera uma migration via `npx prisma migrate dev`, e só então o código é atualizado.
 
-8. **NUNCA crie atributos, campos, colunas ou modelos que não estejam no `schema.prisma`.** Esta regra é absoluta. Se ao implementar uma task você perceber que precisa de um campo novo (ex: `Submission.linkedInUrl`, `UserAccount.bio`, `Evaluation.isAnonymous`, `Favorite { userId, submissionId }`), **pare imediatamente e pergunte ao desenvolvedor**. Não:
+8. **NUNCA crie atributos, campos, colunas ou modelos que não estejam no `schema.prisma`.** Esta regra é absoluta. Se ao implementar uma task você perceber que precisa de um campo novo (ex: `Submission.linkedInUrl`, `UserAccount.bio`, `Evaluation.isAnonymous`), **pare imediatamente e pergunte ao desenvolvedor**. Não:
    - Adicione propriedades em DTOs que não correspondem a campos do schema.
    - Crie campos calculados ou virtuais "úteis" no service sem aprovação.
    - Use campos `metadata: Json` ou similares como escape para guardar dados não modelados.
@@ -489,8 +489,8 @@ Para evitar alucinações e desvios, aqui está uma lista explícita do que **nu
 
 - **Não instale bibliotecas** que não estejam no design.md Seção 2.
 - **Não crie endpoints** que não estejam definidos na task.
-- **Não crie tabelas, colunas, campos ou modelos Prisma** que não estejam no schema do design.md Seção 4. Isso inclui campos que pareçam "óbvios" ou "úteis" (ex: `bio`, `linkedinUrl`, `Favorite { userId, submissionId }`, `audit_log`). Se a task pede algo que exige um campo ausente do schema, **pare e pergunte** — esse caso é um bug da task. Ver **Regra 8** (Seção 3).
-- **Caso especial — Favoritos**: o sistema de favoritos do Ouvinte (T-3.15) **não tem schema correspondente** no Prisma. A task explicita que está bloqueada até decisão do desenvolvedor. Não invente o modelo `Favorite`. Não persista no `localStorage`. Não use atributos virtuais. Pergunte.
+- **Não crie tabelas, colunas, campos ou modelos Prisma** que não estejam no schema do design.md Seção 4. Isso inclui campos que pareçam "óbvios" ou "úteis" (ex: `bio`, `linkedinUrl`, `audit_log`). Se a task pede algo que exige um campo ausente do schema, **pare e pergunte** — esse caso é um bug da task. Ver **Regra 8** (Seção 3).
+- **Favoritos/Bookmarks** usa relação implícita `bookmarkedPresentations` ↔ `bookmarkedUsers`. Não crie model `Favorite` explícito.
 - **Não crie pastas ou módulos** fora da estrutura do design.md Seção 3.2.
 - **Não use Tailwind.** Converta tudo para Bootstrap 5.
 - **Não use localStorage** para armazenar JWT no frontend. A estratégia oficial é **cookies httpOnly** definidos pelo backend no login (com `Secure`, `SameSite=Lax`). O frontend não armazena nem lê o token diretamente — apenas envia requisições com `withCredentials: true` no Axios e o navegador anexa o cookie automaticamente. Detalhes em design.md Seção 5 e na task T-2.5b.

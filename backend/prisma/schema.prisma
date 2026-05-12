@@ -88,6 +88,7 @@ model UserAccount {
   awardedPanelists    AwardedPanelist[]
   committeeMembers    CommitteeMember[]
   certificates        Certificate[]
+  bookmarkedPresentations Presentation[]
 }
 
 model EmailVerification {
@@ -228,6 +229,7 @@ model Presentation {
 
   submission        Submission        @relation(fields: [submissionId], references: [id])
   presentationBlock PresentationBlock @relation(fields: [presentationBlockId], references: [id])
+  bookmarkedUsers   UserAccount[]
 }
 
 model Panelist {

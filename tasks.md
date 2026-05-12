@@ -918,51 +918,46 @@ Esses critérios não são fixos no código — são registros normais da tabela
 
 ---
 
-## T-2.20b: Módulo Favorite — Repository, Service e Controller
+## T-2.20b: Módulo Bookmark — Repository, Service e Controller
 
-**Descrição**: CRUD do recurso de favoritar apresentações. Suporta a Visão Ouvinte/Logado (T-3.14). O modelo `Favorite` está definido no design.md Seção 4.2 (chave primária composta `[userId, submissionId]`).
+**Descrição**: Recurso de favoritar (bookmark) apresentações. Suporta a Visão Ouvinte/Logado (T-3.14). Usa a relação implícita many-to-many `bookmarkedPresentations` ↔ `bookmarkedUsers` entre `UserAccount` e `Presentation` — não existe model `Favorite` explícito.
 
 **Arquivos a criar/modificar**:
-- `backend/src/favorite/favorite.module.ts`
-- `backend/src/favorite/favorite.service.ts`
-- `backend/src/favorite/favorite.controller.ts`
-- `backend/src/favorite/favorite.repository.ts`
-- `backend/src/favorite/dto/create-favorite.dto.ts`
-- `backend/src/favorite/favorite.service.spec.ts`
-- `backend/src/app.module.ts` (registrar `FavoriteModule`).
+- `backend/src/bookmark/bookmark.module.ts`
+- `backend/src/bookmark/bookmark.service.ts`
+- `backend/src/bookmark/bookmark.controller.ts`
+- `backend/src/bookmark/bookmark.repository.ts`
+- `backend/src/bookmark/bookmark.service.spec.ts`
+- `backend/src/app.module.ts` (registrar `BookmarkModule`).
 
 **Endpoints**:
-- `POST /api/v1/favorites` — criar/marcar favorito. Restrito a usuário autenticado. Body: `{ submissionId }` (o `userId` vem do JWT, não do body).
-- `GET /api/v1/favorites/my` — listar favoritos do usuário logado, com dados da submissão (title, mainAuthor.name).
-- `DELETE /api/v1/favorites/:submissionId` — remover favorito do usuário logado.
-- `GET /api/v1/favorites/check/:submissionId` — retorna `{ isFavorite: boolean }` para o usuário logado e a submissão (otimização do frontend para já marcar a estrela ao listar apresentações).
+- `POST /api/v1/presentations/:presentationId/bookmark` — marcar bookmark. Restrito a usuário autenticado. Sem body (presentationId vem da URL, userId do JWT). Idempotente — bookmarkar duas vezes não erra.
+- `DELETE /api/v1/presentations/:presentationId/bookmark` — remover bookmark do usuário logado. Idempotente — remover inexistente retorna 204.
+- `GET /api/v1/presentations/bookmarks/my` — listar apresentações bookmarkadas do usuário logado, com dados da submission (title, mainAuthor.name).
+- `GET /api/v1/presentations/:presentationId/bookmark/check` — retorna `{ isBookmarked: boolean }` para o usuário logado e a apresentação.
 
-**DTO `CreateFavoriteDto`**:
-- `submissionId`: string (UUID), obrigatório.
-
-**Lógica do `FavoriteService`**:
-- `create(userId, submissionId)`: faz `upsert` na tabela `Favorite` com chave composta. Idempotente — favoritar duas vezes não erra, retorna 200.
-- `remove(userId, submissionId)`: deleta o registro. Se não existe, retorna 204 mesmo assim (idempotente).
-- `findByUser(userId)`: retorna lista de favoritos com `submission` populada (include).
-- `isFavorite(userId, submissionId)`: retorna boolean.
+**Lógica do `BookmarkService`**:
+- `add(userId, presentationId)`: faz `connect` na relação `bookmarkedUsers`. Idempotente.
+- `remove(userId, presentationId)`: faz `disconnect` na relação `bookmarkedUsers`. Idempotente.
+- `findByUser(userId)`: retorna lista de presentations com `submission` populada.
+- `isBookmarked(userId, presentationId)`: retorna boolean.
 
 **Validações**:
-- `submissionId` deve referenciar uma submissão existente. Caso contrário, 404.
-- Não há restrição de quantos favoritos um usuário pode ter.
+- `presentationId` deve referenciar uma apresentação existente. Caso contrário, 404.
+- Não há restrição de quantos bookmarks um usuário pode ter.
 
 **Critérios de aceitação**:
 - Testes unitários (mock do repository):
-  - Criar favorito válido → 201.
-  - Criar favorito duplicado → 200 (upsert, idempotente).
-  - Criar favorito com submissionId inexistente → 404.
-  - Listar `/my` → retorna apenas favoritos do user do JWT.
-  - Remover favorito existente → 204.
-  - Remover favorito inexistente → 204 (idempotente).
-  - `check` retorna `true` se favorito existe, `false` caso contrário.
-  - Acesso sem autenticação a `/my`, `POST` ou `DELETE` → 401.
+  - Bookmarkar apresentação válida → 201.
+  - Bookmarkar apresentação duplicada → 200 (idempotente).
+  - Bookmarkar apresentação inexistente → 404.
+  - Listar `/bookmarks/my` → retorna apenas bookmarks do user do JWT.
+  - Remover bookmark existente → 204.
+  - Remover bookmark inexistente → 204 (idempotente).
+  - `check` retorna `true` se bookmarked, `false` caso contrário.
 - `npm run test` passa.
 
-**Dependências**: T-2.12 (Submission), T-2.5 (Auth/JWT).
+**Dependências**: T-2.13 (Presentation), T-2.5 (Auth/JWT).
 
 ---
 
