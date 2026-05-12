@@ -15,6 +15,7 @@ import { PresentationModule } from './presentation/presentation.module';
 import { EvaluationModule } from './evaluation/evaluation.module';
 import { CertificateModule } from './certificate/certificate.module';
 import { BookmarkModule } from './bookmark/bookmark.module';
+import { ContactModule } from './contact/contact.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { BookmarkModule } from './bookmark/bookmark.module';
     EvaluationModule,
     CertificateModule,
     BookmarkModule,
+    ContactModule,
   ],
   controllers: [AppController],
   providers: [AppService],
