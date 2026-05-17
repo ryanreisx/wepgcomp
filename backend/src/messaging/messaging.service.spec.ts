@@ -1,22 +1,14 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { ConfigService } from '@nestjs/config';
+import { of, throwError } from 'rxjs';
 import { MessagingService } from './messaging.service';
 
 describe('MessagingService', () => {
   let service: MessagingService;
-  const mockChannel = {
-    assertQueue: jest.fn().mockResolvedValue(undefined),
-    sendToQueue: jest.fn().mockReturnValue(true),
-    ack: jest.fn(),
-  };
 
-  const mockConnection = {
-    createChannel: jest.fn().mockResolvedValue(mockChannel),
-    close: jest.fn().mockResolvedValue(undefined),
-  };
-
-  const mockAmqplib = {
-    connect: jest.fn().mockResolvedValue(mockConnection),
+  const mockClientProxy = {
+    emit: jest.fn(),
+    connect: jest.fn(),
+    close: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -26,18 +18,13 @@ describe('MessagingService', () => {
       providers: [
         MessagingService,
         {
-          provide: ConfigService,
-          useValue: {
-            get: jest.fn().mockReturnValue('amqp://localhost:5672'),
-          },
+          provide: 'EMAIL_SERVICE',
+          useValue: mockClientProxy,
         },
       ],
     }).compile();
 
     service = module.get<MessagingService>(MessagingService);
-
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    (service as any).amqplib = mockAmqplib;
   });
 
   it('should be defined', () => {
@@ -45,61 +32,77 @@ describe('MessagingService', () => {
   });
 
   describe('publish', () => {
-    it('should connect to RabbitMQ using CLOUDAMQP_URL', async () => {
+    it('should emit data to the correct queue pattern', async () => {
+      mockClientProxy.emit.mockReturnValue(of(undefined));
+
       await service.publish('email-send', { to: 'test@example.com' });
 
-      expect(mockAmqplib.connect).toHaveBeenCalledWith('amqp://localhost:5672');
-    });
-
-    it('should assert the queue before sending', async () => {
-      await service.publish('email-send', { to: 'test@example.com' });
-
-      expect(mockChannel.assertQueue).toHaveBeenCalledWith('email-send', {
-        durable: true,
+      expect(mockClientProxy.emit).toHaveBeenCalledWith('email-send', {
+        to: 'test@example.com',
       });
-    });
-
-    it('should send the serialized data to the correct queue', async () => {
-      const data = { to: 'test@example.com', subject: 'Welcome' };
-
-      await service.publish('email-send', data);
-
-      expect(mockChannel.sendToQueue).toHaveBeenCalledWith(
-        'email-send',
-        Buffer.from(JSON.stringify(data)),
-        { persistent: true },
-      );
-    });
-
-    it('should close the connection after publishing', async () => {
-      await service.publish('email-send', { to: 'test@example.com' });
-
-      expect(mockConnection.close).toHaveBeenCalled();
     });
 
     it('should publish to different queues correctly', async () => {
+      mockClientProxy.emit.mockReturnValue(of(undefined));
+
       await service.publish('email-error', { error: 'Failed to send' });
 
-      expect(mockChannel.assertQueue).toHaveBeenCalledWith('email-error', {
-        durable: true,
+      expect(mockClientProxy.emit).toHaveBeenCalledWith('email-error', {
+        error: 'Failed to send',
       });
-      expect(mockChannel.sendToQueue).toHaveBeenCalledWith(
-        'email-error',
-        Buffer.from(JSON.stringify({ error: 'Failed to send' })),
-        { persistent: true },
-      );
     });
 
-    it('should close connection even if sendToQueue fails', async () => {
-      mockChannel.sendToQueue.mockImplementationOnce(() => {
-        throw new Error('Queue full');
-      });
+    it('should propagate errors from the client', async () => {
+      mockClientProxy.emit.mockReturnValue(
+        throwError(() => new Error('Connection refused')),
+      );
 
       await expect(
         service.publish('email-send', { to: 'test@example.com' }),
-      ).rejects.toThrow('Queue full');
+      ).rejects.toThrow('Connection refused');
+    });
 
-      expect(mockConnection.close).toHaveBeenCalled();
+    it('should call emit exactly once per publish', async () => {
+      mockClientProxy.emit.mockReturnValue(of(undefined));
+
+      await service.publish('email-send', { data: 'test' });
+
+      expect(mockClientProxy.emit).toHaveBeenCalledTimes(1);
+    });
+
+    it('should handle complex data payloads', async () => {
+      mockClientProxy.emit.mockReturnValue(of(undefined));
+      const payload = {
+        email: 'user@ufba.br',
+        name: 'Test User',
+        token: 'abc-123',
+        type: 'password-reset',
+      };
+
+      await service.publish('email-send', payload);
+
+      expect(mockClientProxy.emit).toHaveBeenCalledWith(
+        'email-send',
+        payload,
+      );
+    });
+
+    it('should emit to email-rate-limit queue', async () => {
+      mockClientProxy.emit.mockReturnValue(of(undefined));
+
+      await service.publish('email-rate-limit', { count: 100 });
+
+      expect(mockClientProxy.emit).toHaveBeenCalledWith('email-rate-limit', {
+        count: 100,
+      });
+    });
+
+    it('should resolve without returning data', async () => {
+      mockClientProxy.emit.mockReturnValue(of(undefined));
+
+      const result = await service.publish('email-send', { to: 'a@b.com' });
+
+      expect(result).toBeUndefined();
     });
   });
 });

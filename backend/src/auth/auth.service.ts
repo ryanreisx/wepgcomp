@@ -38,6 +38,17 @@ export class AuthService {
       );
     }
 
+    if (
+      dto.profile &&
+      (dto.profile === Profile.DoctoralStudent ||
+        dto.profile === Profile.Professor) &&
+      !dto.email.endsWith('@ufba.br')
+    ) {
+      throw new BadRequestException(
+        'A valid UFBA email (@ufba.br) is required for DoctoralStudent or Professor profiles',
+      );
+    }
+
     const isUfba = dto.email.endsWith('@ufba.br');
     let profile: Profile;
     let isActive: boolean;
