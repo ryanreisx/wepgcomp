@@ -277,31 +277,31 @@ async function main() {
       eventEditionId: EDITION_ID,
       userId: USER_IDS.coordenador,
       level: 'Coordinator' as const,
-      role: 'Organizer' as const,
+      role: 'OrganizingCommittee' as const,
     },
     {
       eventEditionId: EDITION_ID,
       userId: USER_IDS.prof1,
       level: 'Committee' as const,
-      role: 'Organizer' as const,
+      role: 'OrganizingCommittee' as const,
     },
     {
       eventEditionId: EDITION_ID,
       userId: USER_IDS.prof2,
       level: 'Committee' as const,
-      role: 'Reviewer' as const,
+      role: 'OrganizingCommittee' as const,
     },
     {
       eventEditionId: EDITION_ID,
       userId: USER_IDS.doc1,
       level: 'Committee' as const,
-      role: 'Evaluator' as const,
+      role: 'StudentVolunteers' as const,
     },
     {
       eventEditionId: EDITION_ID,
       userId: USER_IDS.doc2,
       level: 'Committee' as const,
-      role: 'Evaluator' as const,
+      role: 'StudentVolunteers' as const,
     },
   ];
 
@@ -506,7 +506,12 @@ async function main() {
       where: { presentationBlockId: p.blockId, userId: p.userId },
     });
     if (!existing) {
-      await prisma.panelist.create({ data: p });
+await prisma.panelist.create({
+    data: {
+      presentationBlockId: p.blockId,
+      userId: p.userId,
+    },
+  });
     }
   }
   console.log(`  ✓ ${panelistAssignments.length} panelists`);

@@ -20,7 +20,7 @@ const mockMember = {
   eventEditionId: 'edition-1',
   userId: 'user-1',
   level: CommitteeLevel.Committee,
-  role: CommitteeRole.Organizer,
+  role: CommitteeRole.OrganizingCommittee,
   createdAt: new Date(),
   updatedAt: new Date(),
 };
@@ -30,7 +30,7 @@ const mockCoordinator = {
   id: 'member-2',
   userId: 'user-2',
   level: CommitteeLevel.Coordinator,
-  role: CommitteeRole.Organizer,
+  role: CommitteeRole.OrganizingCommittee,
 };
 
 const mockEdition = { id: 'edition-1', name: 'WEPGCOMP 2025' };
@@ -87,7 +87,7 @@ describe('CommitteeService', () => {
       eventEditionId: 'edition-1',
       userId: 'user-1',
       level: CommitteeLevel.Committee,
-      role: CommitteeRole.Organizer,
+      role: CommitteeRole.OrganizingCommittee,
     };
 
     it('should create a committee member', async () => {
@@ -140,7 +140,7 @@ describe('CommitteeService', () => {
       eventEditionId: 'edition-1',
       userId: 'user-1',
       level: CommitteeLevel.Coordinator,
-      role: CommitteeRole.Organizer,
+      role: CommitteeRole.OrganizingCommittee,
     };
 
     it('should assign coordinator and auto-promote to Superadmin', async () => {

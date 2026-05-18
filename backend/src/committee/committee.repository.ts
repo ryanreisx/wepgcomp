@@ -41,7 +41,7 @@ export class CommitteeRepository {
       where: {
         eventEditionId,
         level: CommitteeLevel.Coordinator,
-        role: CommitteeRole.Organizer,
+        role: CommitteeRole.OrganizingCommittee,
       },
     });
   }

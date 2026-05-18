@@ -59,9 +59,11 @@ enum CommitteeLevel {
 }
 
 enum CommitteeRole {
-  Organizer
-  Reviewer
-  Evaluator
+  OrganizingCommittee
+  StudentVolunteers
+  AdministativeSupport
+  Communication
+  ITSupport
 }
 
 // ─── Models ──────────────────────────────────────────────

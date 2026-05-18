@@ -42,7 +42,7 @@ export class CommitteeService {
 
     const isCoordinator =
       dto.level === CommitteeLevel.Coordinator &&
-      dto.role === CommitteeRole.Organizer;
+      dto.role === CommitteeRole.OrganizingCommittee;
 
     if (isCoordinator) {
       if (callerLevel !== UserLevel.Superadmin) {
