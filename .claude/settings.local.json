@@ -21,7 +21,11 @@
       "Bash(npx jest *)",
       "Bash(node -e \"const c = require\\('./node_modules/@jest/core/node_modules/jest-config/build/index.js'\\); console.log\\(Object.keys\\(c.defaults\\).filter\\(k => k.toLowerCase\\(\\).includes\\('setup'\\)\\)\\)\")",
       "Bash(node -e \"const yaml = require\\('yaml'\\); const fs = require\\('fs'\\); ['ci-backend.yml','ci-frontend.yml','codeql.yml'].forEach\\(f => { try { yaml.parse\\(fs.readFileSync\\('.github/workflows/'+f,'utf8'\\)\\); console.log\\(f+': OK'\\); } catch\\(e\\) { console.log\\(f+': ERRO - '+e.message\\); } }\\)\")",
-      "Bash(node -e \"const js_yaml = require\\('js-yaml'\\); const fs = require\\('fs'\\); ['ci-backend.yml','ci-frontend.yml','codeql.yml'].forEach\\(f => { try { js_yaml.load\\(fs.readFileSync\\('.github/workflows/'+f,'utf8'\\)\\); console.log\\(f+': OK'\\); } catch\\(e\\) { console.log\\(f+': ERRO - '+e.message\\); } }\\)\")"
+      "Bash(node -e \"const js_yaml = require\\('js-yaml'\\); const fs = require\\('fs'\\); ['ci-backend.yml','ci-frontend.yml','codeql.yml'].forEach\\(f => { try { js_yaml.load\\(fs.readFileSync\\('.github/workflows/'+f,'utf8'\\)\\); console.log\\(f+': OK'\\); } catch\\(e\\) { console.log\\(f+': ERRO - '+e.message\\); } }\\)\")",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\ryan0\\\\OneDrive\\\\Área de Trabalho\\\\wepgcomp\\\\backend\\\\src\" -Recurse -Name)",
+      "Bash(grep -E \"\\\\.\\(ts|js\\)$\")",
+      "Bash(node -e \"const p = require.resolve\\('multer'\\); const fs = require\\('fs'\\); const dir = require\\('path'\\).dirname\\(p\\); console.log\\(fs.readdirSync\\(dir\\).filter\\(f => f.endsWith\\('.d.ts'\\) || f === 'types'\\).join\\('\\\\n'\\) || 'no dts files'\\)\")",
+      "PowerShell(npx jest --no-coverage 2>&1)"
     ]
   }
 }
