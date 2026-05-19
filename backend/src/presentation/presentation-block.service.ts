@@ -21,6 +21,7 @@ export class PresentationBlockService {
     const edition = await this.eventEditionService.findById(dto.eventEditionId);
     const startTime = new Date(dto.startTime);
 
+    this.validateRoomForPresentation(dto.type, dto.roomId ?? null);
     this.validateTimeWithinEvent(startTime, dto.duration, edition);
     this.validateDurationMultiple(dto.type, dto.duration, edition);
 
@@ -69,6 +70,7 @@ export class PresentationBlockService {
     const roomId =
       dto.roomId !== undefined ? (dto.roomId ?? null) : existing.roomId;
 
+    this.validateRoomForPresentation(type, roomId);
     this.validateTimeWithinEvent(startTime, duration, edition);
     this.validateDurationMultiple(type, duration, edition);
 
@@ -91,6 +93,17 @@ export class PresentationBlockService {
     await this.repository.deletePresentationsByBlock(id);
     await this.repository.clearProposedBlock(id);
     await this.repository.delete(id);
+  }
+
+  private validateRoomForPresentation(
+    type: PresentationBlockType,
+    roomId: string | null,
+  ): void {
+    if (type === PresentationBlockType.Presentation && !roomId) {
+      throw new BadRequestException(
+        'Room is required for presentation sessions',
+      );
+    }
   }
 
   private validateTimeWithinEvent(

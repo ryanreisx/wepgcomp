@@ -374,7 +374,7 @@ async function main() {
       id: BLOCK_IDS.keynote,
       eventEditionId: EDITION_ID,
       roomId: ROOM_IDS.salaA,
-      type: 'Keynote' as const,
+      type: 'General' as const,
       title: 'Palestra — Avanços em IA',
       speakerName: 'Prof. João da Silva',
       startTime: new Date(blockStart.getTime() + 3 * 60 * 60 * 1000),
@@ -383,7 +383,7 @@ async function main() {
     {
       id: BLOCK_IDS.coffeeBreak,
       eventEditionId: EDITION_ID,
-      type: 'Break' as const,
+      type: 'General' as const,
       title: 'Coffee Break',
       startTime: new Date(blockStart.getTime() + 2 * 60 * 60 * 1000),
       duration: 30,

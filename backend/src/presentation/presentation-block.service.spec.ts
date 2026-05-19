@@ -111,6 +111,41 @@ describe('PresentationBlockService', () => {
       );
     });
 
+    it('should throw BadRequestException when type is Presentation and roomId is missing', async () => {
+      mockEventEditionService.findById.mockResolvedValue(mockEdition);
+
+      const dto = {
+        ...createDto,
+        roomId: undefined,
+      };
+
+      await expect(service.create(dto)).rejects.toThrow(BadRequestException);
+      await expect(service.create(dto)).rejects.toThrow(
+        'Room is required for presentation sessions',
+      );
+      expect(mockRepository.create).not.toHaveBeenCalled();
+    });
+
+    it('should allow General type without roomId', async () => {
+      mockEventEditionService.findById.mockResolvedValue(mockEdition);
+      mockRepository.findBlocksByEdition.mockResolvedValue([]);
+      const generalBlock = {
+        ...mockBlock,
+        type: PresentationBlockType.General,
+        roomId: null,
+      };
+      mockRepository.create.mockResolvedValue(generalBlock);
+
+      const dto = {
+        ...createDto,
+        type: PresentationBlockType.General,
+        roomId: undefined,
+        duration: 30,
+      };
+
+      await expect(service.create(dto)).resolves.toBeDefined();
+    });
+
     it('should throw BadRequestException when time is outside event period', async () => {
       mockEventEditionService.findById.mockResolvedValue(mockEdition);
 
@@ -151,16 +186,16 @@ describe('PresentationBlockService', () => {
     it('should allow non-Presentation type with any duration', async () => {
       mockEventEditionService.findById.mockResolvedValue(mockEdition);
       mockRepository.findBlocksByEdition.mockResolvedValue([]);
-      const keynoteBlock = {
+      const generalBlock = {
         ...mockBlock,
-        type: PresentationBlockType.Keynote,
+        type: PresentationBlockType.General,
         duration: 35,
       };
-      mockRepository.create.mockResolvedValue(keynoteBlock);
+      mockRepository.create.mockResolvedValue(generalBlock);
 
       const dto = {
         ...createDto,
-        type: PresentationBlockType.Keynote,
+        type: PresentationBlockType.General,
         duration: 35,
       };
 
@@ -212,12 +247,13 @@ describe('PresentationBlockService', () => {
       await expect(service.create(dto)).rejects.toThrow(ConflictException);
     });
 
-    it('should block all rooms when creating a session without room (roomId = null)', async () => {
+    it('should block all rooms when creating a General session without room (roomId = null)', async () => {
       mockEventEditionService.findById.mockResolvedValue(mockEdition);
       mockRepository.findBlocksByEdition.mockResolvedValue([mockBlock]);
 
       const dto = {
         ...createDto,
+        type: PresentationBlockType.General,
         startTime: '2025-12-01T10:30:00.000Z',
         roomId: undefined,
       };
@@ -312,6 +348,22 @@ describe('PresentationBlockService', () => {
         'edition-1',
         'block-1',
       );
+    });
+
+    it('should throw BadRequestException when updating to Presentation type without roomId', async () => {
+      const generalBlock = {
+        ...mockBlock,
+        type: PresentationBlockType.General,
+        roomId: null,
+      };
+      mockRepository.findById.mockResolvedValue(generalBlock);
+      mockEventEditionService.findById.mockResolvedValue(mockEdition);
+
+      await expect(
+        service.update('block-1', {
+          type: PresentationBlockType.Presentation,
+        }),
+      ).rejects.toThrow('Room is required for presentation sessions');
     });
 
     it('should throw ConflictException when update causes overlap', async () => {
