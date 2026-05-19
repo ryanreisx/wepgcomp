@@ -1,0 +1,57 @@
+.footer {
+  background-color: #2a2a2a;
+  padding: 2.5rem 0 1.5rem;
+  margin-top: auto;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.heading {
+  font-family: var(--font-poppins);
+  font-weight: 600;
+  font-size: 1rem;
+  color: #ffffff;
+  margin-bottom: 0.5rem;
+}
+
+.text {
+  font-family: var(--font-poppins);
+  font-weight: 400;
+  font-size: 0.875rem;
+  color: #d4d4d4;
+  margin: 0.25rem 0;
+}
+
+.link {
+  color: #d4d4d4;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.link:hover {
+  color: #ffffff;
+}
+
+.logos {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid #555555;
+}
+
+.logoImg {
+  height: 40px;
+  object-fit: contain;
+}
+
+.copyright {
+  border-top: 1px solid #555555;
+  padding-top: 1rem;
+  text-align: center;
+}
