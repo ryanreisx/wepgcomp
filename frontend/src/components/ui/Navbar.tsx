@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import styles from "./Navbar.module.css";
 
 export interface NavLink {
@@ -12,6 +13,7 @@ export interface NavLink {
 interface NavbarProps {
   links?: NavLink[];
   logoText?: string;
+  logoSrc?: string;
   loginHref?: string;
   loginLabel?: string;
   onHamburgerClick?: () => void;
@@ -22,6 +24,7 @@ interface NavbarProps {
 export default function Navbar({
   links = [],
   logoText = "PGCOMP",
+  logoSrc,
   loginHref = "/login",
   loginLabel = "Login",
   onHamburgerClick,
@@ -34,7 +37,18 @@ export default function Navbar({
     <nav className={styles.navbar}>
       <div className={`container ${styles.container}`}>
         <Link href="/" className={styles.logo}>
-          {logoText}
+          {logoSrc ? (
+            <Image
+              src={logoSrc}
+              alt={logoText || "Logo"}
+              height={40}
+              width={180}
+              className={styles.logoImg}
+              unoptimized
+            />
+          ) : (
+            logoText
+          )}
         </Link>
 
         <ul className={`${styles.links} ${mobileOpen ? styles["links--open"] : ""}`}>

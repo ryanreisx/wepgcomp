@@ -8,10 +8,12 @@
 }
 
 .star {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   background: none;
   border: none;
   cursor: pointer;
-  font-size: 1.5rem;
   padding: 0;
   line-height: 1;
   color: #d4d4d4;

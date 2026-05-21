@@ -4,6 +4,21 @@
   margin-top: auto;
 }
 
+.footerCompact {
+  background-color: #555555;
+  padding: 1rem 0;
+  margin-top: auto;
+}
+
+.footerCompact .copyright {
+  border-top: none;
+  padding-top: 0;
+}
+
+.footerCompact .text {
+  color: #ffffff;
+}
+
 .container {
   display: flex;
   flex-direction: column;

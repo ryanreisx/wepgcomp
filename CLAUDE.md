@@ -290,21 +290,20 @@ A instância Axios em `services/api.ts` inclui interceptor que injeta `Authoriza
 
 ### 7.1. Configuração no Claude Code
 
-Adicionar ao arquivo de configuração do Claude Code (`.claude/settings.json` ou `~/.claude/settings.json`):
+O Figma MCP usa **OAuth2** (não Personal Access Token). A configuração em `.claude/settings.json`:
 
 ```json
 {
   "mcpServers": {
     "figma": {
       "type": "url",
-      "url": "https://mcp.figma.com/mcp",
-      "headers": {
-        "Authorization": "Bearer <Token>"
-      }
+      "url": "https://mcp.figma.com/mcp"
     }
   }
 }
 ```
+
+**Importante:** Não incluir header `Authorization` com token pessoal — o endpoint MCP rejeita Personal Access Tokens (`figd_*`). O Claude Code lida com o fluxo OAuth automaticamente: ao iniciar a sessão, ele detecta que o MCP requer autenticação, abre o navegador para autorização, e obtém um token OAuth com scope `mcp:connect`. Se as ferramentas do Figma não aparecerem na sessão, reinicie o Claude Code para re-disparar o fluxo OAuth.
 
 O json da configuração do mcpServers está em .claude/settings.json
 
@@ -371,7 +370,7 @@ Implementar uma única vez e proteger por perfil/nível/visão. O agente **não 
 
 ### 7.5. Limitações
 
-- O plano Starter do Figma tem limite de chamadas MCP por período. Se atingir o limite, usar a Seção 6 (Design System) como referência e o PDF do protótipo como backup visual.
+- O plano Starter do Figma tem limite de chamadas MCP por período. Se atingir o limite, **peça ao desenvolvedor prints (screenshots) da tela em questão** antes de prosseguir. O resultado deve ser fidedigno ao Figma — não adivinhe ou aproxime com base apenas nos tokens. Use a Seção 6 (Design System) como complemento, mas os prints são a referência visual primária quando o MCP estiver indisponível.
 - O MCP não retorna imagens reais (fotos, logos). Usar placeholders e substituir manualmente depois.
 
 ---

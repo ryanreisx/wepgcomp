@@ -4,6 +4,7 @@ import Image from "next/image";
 import styles from "./Footer.module.css";
 
 interface FooterProps {
+  variant?: "full" | "compact";
   contactEmail?: string;
   contactPhone?: string;
   location?: string;
@@ -12,6 +13,7 @@ interface FooterProps {
 }
 
 export default function Footer({
+  variant = "full",
   contactEmail,
   contactPhone,
   location,
@@ -19,6 +21,20 @@ export default function Footer({
   className = "",
 }: FooterProps) {
   const currentYear = new Date().getFullYear();
+
+  if (variant === "compact") {
+    return (
+      <footer className={`${styles.footerCompact} ${className}`}>
+        <div className={`container ${styles.container}`}>
+          <div className={styles.copyright}>
+            <p className={styles.text}>
+              &copy; {currentYear} WEPGCOMP
+            </p>
+          </div>
+        </div>
+      </footer>
+    );
+  }
 
   return (
     <footer className={`${styles.footer} ${className}`}>
