@@ -1,0 +1,199 @@
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 160px);
+  padding: 2rem 1rem;
+}
+
+.card {
+  background-color: #ffffff;
+  padding: 2.5rem 2rem;
+  width: 100%;
+  max-width: 480px;
+}
+
+.cardWide {
+  max-width: 720px;
+}
+
+.title {
+  font-family: var(--font-poppins);
+  font-weight: 700;
+  font-size: 1.75rem;
+  color: #2a2a2a;
+  text-align: center;
+  margin: 0 0 1.25rem;
+}
+
+.subtitle {
+  font-family: var(--font-poppins);
+  font-weight: 400;
+  font-size: 0.9375rem;
+  color: #555555;
+  text-align: center;
+  margin: 0 0 1.5rem;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.radioGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.radioGroupLabel {
+  font-family: var(--font-poppins);
+  font-weight: 500;
+  font-size: 0.875rem;
+  color: #2a2a2a;
+  margin-bottom: 0.25rem;
+}
+
+.radioGroupLabel .asterisk {
+  color: #ff1a25;
+}
+
+.radioOptions {
+  display: flex;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.radioLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-family: var(--font-poppins);
+  font-weight: 400;
+  font-size: 0.9375rem;
+  color: #2a2a2a;
+  cursor: pointer;
+}
+
+.radioLabel input[type="radio"] {
+  accent-color: #0066ba;
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.link {
+  font-family: var(--font-poppins);
+  font-weight: 500;
+  font-size: 0.875rem;
+  color: #0066ba;
+  text-decoration: none;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+.link:hover {
+  text-decoration: underline;
+  color: #054b75;
+}
+
+.brandHeader {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.brandTitle {
+  font-family: var(--font-raleway);
+  font-weight: 400;
+  font-size: 2.5rem;
+  color: #0066ba;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.brandTitleYear {
+  font-family: var(--font-poppins);
+  font-weight: 400;
+}
+
+.brandLine {
+  width: 50%;
+  height: 3px;
+  background-color: #f2cb05;
+  margin: 0.5rem auto 0;
+  border: none;
+}
+
+.passwordRulesTitle {
+  font-family: var(--font-raleway);
+  font-weight: 600;
+  font-size: 0.75rem;
+  color: #555555;
+  margin: 0 0 0.25rem;
+}
+
+.passwordRules {
+  font-family: var(--font-raleway);
+  font-weight: 600;
+  font-size: 0.75rem;
+  color: #0d0d0d;
+  margin: 0;
+  padding-left: 1.25rem;
+  list-style: disc;
+}
+
+.passwordRules li {
+  margin-bottom: 0.125rem;
+}
+
+.apiError {
+  font-family: var(--font-poppins);
+  font-size: 0.875rem;
+  color: #ff1a25;
+  text-align: center;
+  margin: 0;
+}
+
+.forgotLink {
+  display: block;
+  text-align: right;
+  font-family: var(--font-poppins);
+  font-weight: 400;
+  font-size: 0.8125rem;
+  color: #2a2a2a;
+  text-decoration: none;
+  margin-top: 0.375rem;
+}
+
+.forgotLink:hover {
+  text-decoration: underline;
+  color: #054b75;
+}
+
+.separator {
+  width: 100%;
+  height: 2px;
+  background-color: #f2cb05;
+  margin: 1.5rem 0 1rem;
+  border: none;
+}
+
+.registerText {
+  font-family: var(--font-poppins);
+  font-weight: 400;
+  font-size: 0.9375rem;
+  color: #2a2a2a;
+  text-align: left;
+  margin: 0;
+}
