@@ -17,12 +17,9 @@ export default function AuthLayout({
 }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
-      <Navbar links={PUBLIC_LINKS} />
+      <Navbar links={PUBLIC_LINKS} logoSrc="/images/logo-pgcomp.svg" />
       <main style={{ flex: 1 }}>{children}</main>
-      <Footer
-        contactEmail="pgcomp@ufba.br"
-        location="Salvador, BA — UFBA"
-      />
+      <Footer variant="compact" />
     </div>
   );
 }

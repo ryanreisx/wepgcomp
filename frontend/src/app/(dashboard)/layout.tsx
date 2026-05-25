@@ -18,14 +18,11 @@ export default function DashboardLayout({
 }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
-      <Navbar links={PUBLIC_LINKS} showHamburger>
+      <Navbar links={PUBLIC_LINKS} logoSrc="/images/logo-pgcomp.svg" showHamburger>
         <HamburgerMenu />
       </Navbar>
       <main style={{ flex: 1 }}>{children}</main>
-      <Footer
-        contactEmail="pgcomp@ufba.br"
-        location="Salvador, BA — UFBA"
-      />
+      <Footer />
     </div>
   );
 }

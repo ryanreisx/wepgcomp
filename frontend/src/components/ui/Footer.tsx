@@ -5,19 +5,11 @@ import styles from "./Footer.module.css";
 
 interface FooterProps {
   variant?: "full" | "compact";
-  contactEmail?: string;
-  contactPhone?: string;
-  location?: string;
-  logosSrc?: string[];
   className?: string;
 }
 
 export default function Footer({
   variant = "full",
-  contactEmail,
-  contactPhone,
-  location,
-  logosSrc = [],
   className = "",
 }: FooterProps) {
   const currentYear = new Date().getFullYear();
@@ -25,12 +17,10 @@ export default function Footer({
   if (variant === "compact") {
     return (
       <footer className={`${styles.footerCompact} ${className}`}>
-        <div className={`container ${styles.container}`}>
-          <div className={styles.copyright}>
-            <p className={styles.text}>
-              &copy; {currentYear} WEPGCOMP
-            </p>
-          </div>
+        <div className="container text-center">
+          <p className={styles.copyrightText}>
+            &copy; {currentYear} WEPGCOMP
+          </p>
         </div>
       </footer>
     );
@@ -38,44 +28,50 @@ export default function Footer({
 
   return (
     <footer className={`${styles.footer} ${className}`}>
-      <div className={`container ${styles.container}`}>
-        <div className="row">
-          <div className="col-md-6">
-            <h4 className={styles.heading}>Contato</h4>
-            {contactEmail && (
-              <p className={styles.text}>
-                <a href={`mailto:${contactEmail}`} className={styles.link}>
-                  {contactEmail}
-                </a>
-              </p>
-            )}
-            {contactPhone && <p className={styles.text}>{contactPhone}</p>}
-          </div>
-          <div className="col-md-6">
-            <h4 className={styles.heading}>Local</h4>
-            {location && <p className={styles.text}>{location}</p>}
+      <div className={styles.logosSection}>
+        <div className="container">
+          <div className="row">
+            <div className="col-md-6 mb-3 mb-md-0">
+              <h4 className={styles.heading}>Realização:</h4>
+              <div className={styles.logoGroup}>
+                <Image
+                  src="/images/logo-computacao-ufba.webp"
+                  alt="Computação UFBA"
+                  width={140}
+                  height={45}
+                  className={styles.logoImg}
+                  unoptimized
+                />
+              </div>
+            </div>
+            <div className="col-md-6">
+              <h4 className={styles.heading}>Apoio:</h4>
+              <div className={styles.logoGroup}>
+                <Image
+                  src="/images/logo-ufba.svg"
+                  alt="UFBA"
+                  width={80}
+                  height={48}
+                  className={styles.logoImg}
+                  unoptimized
+                />
+                <Image
+                  src="/images/logo-jusbrasil.png"
+                  alt="Jusbrasil"
+                  width={100}
+                  height={32}
+                  className={styles.logoImg}
+                  unoptimized
+                />
+              </div>
+            </div>
           </div>
         </div>
-
-        {logosSrc.length > 0 && (
-          <div className={styles.logos}>
-            {logosSrc.map((src, i) => (
-              <Image
-                key={i}
-                src={src}
-                alt={`Logo parceiro ${i + 1}`}
-                width={120}
-                height={40}
-                className={styles.logoImg}
-                unoptimized
-              />
-            ))}
-          </div>
-        )}
-
-        <div className={styles.copyright}>
-          <p className={styles.text}>
-            &copy; {currentYear} WEPGCOMP — UFBA. Todos os direitos reservados.
+      </div>
+      <div className={styles.copyrightSection}>
+        <div className="container text-center">
+          <p className={styles.copyrightText}>
+            &copy; {currentYear} WEPGCOMP
           </p>
         </div>
       </div>

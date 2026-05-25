@@ -23,15 +23,13 @@ export default function PublicLayout({
     <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
       <Navbar
         links={PUBLIC_LINKS}
+        logoSrc="/images/logo-pgcomp.svg"
         showHamburger={isAuthenticated}
       >
         {isAuthenticated && <HamburgerMenu />}
       </Navbar>
       <main style={{ flex: 1 }}>{children}</main>
-      <Footer
-        contactEmail="pgcomp@ufba.br"
-        location="Salvador, BA — UFBA"
-      />
+      <Footer />
     </div>
   );
 }
