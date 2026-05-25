@@ -5,7 +5,9 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Input from "@/components/ui/Input";
 import Button from "@/components/ui/Button";
+import Modal from "@/components/ui/Modal";
 import { useAuth } from "@/hooks/useAuth";
+import * as authService from "@/services/auth.service";
 import styles from "../auth.module.css";
 
 interface FormErrors {
@@ -16,12 +18,12 @@ interface FormErrors {
 function validate(email: string, password: string): FormErrors {
   const errors: FormErrors = {};
   if (!email.trim()) {
-    errors.email = "Email é obrigatório";
+    errors.email = "Verifique seu email";
   } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     errors.email = "Email inválido";
   }
   if (!password) {
-    errors.password = "Senha é obrigatória";
+    errors.password = "Verifique sua senha";
   }
   return errors;
 }
@@ -35,6 +37,12 @@ export default function LoginPage() {
   const [errors, setErrors] = useState<FormErrors>({});
   const [apiError, setApiError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+
+  const [showForgot, setShowForgot] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState("");
+  const [forgotError, setForgotError] = useState("");
+  const [forgotSubmitting, setForgotSubmitting] = useState(false);
+  const [showForgotSuccess, setShowForgotSuccess] = useState(false);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -56,6 +64,40 @@ export default function LoginPage() {
     } finally {
       setSubmitting(false);
     }
+  }
+
+  async function handleForgotSubmit(e: FormEvent) {
+    e.preventDefault();
+    setForgotError("");
+
+    if (!forgotEmail.trim()) {
+      setForgotError("Email é obrigatório");
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(forgotEmail)) {
+      setForgotError("Email inválido");
+      return;
+    }
+
+    setForgotSubmitting(true);
+    try {
+      await authService.forgotPassword(forgotEmail.trim());
+      setShowForgot(false);
+      setShowForgotSuccess(true);
+    } catch (err: unknown) {
+      const message =
+        (err as { response?: { data?: { message?: string } } })?.response?.data
+          ?.message || "Erro ao enviar email. Tente novamente.";
+      setForgotError(message);
+    } finally {
+      setForgotSubmitting(false);
+    }
+  }
+
+  function handleOpenForgot() {
+    setForgotEmail("");
+    setForgotError("");
+    setShowForgot(true);
   }
 
   return (
@@ -93,9 +135,13 @@ export default function LoginPage() {
               onChange={(e) => setPassword(e.target.value)}
               error={errors.password}
             />
-            <Link href="/reset-password" className={styles.forgotLink}>
+            <button
+              type="button"
+              className={styles.forgotLink}
+              onClick={handleOpenForgot}
+            >
               Esqueceu sua senha
-            </Link>
+            </button>
           </div>
 
           {apiError && <p className={styles.apiError}>{apiError}</p>}
@@ -116,6 +162,39 @@ export default function LoginPage() {
           </Link>
         </p>
       </div>
+
+      <Modal isOpen={showForgot} onClose={() => setShowForgot(false)} title="Esqueci minha Senha">
+        <p className={styles.forgotDescription}>
+          Por favor, informe o e-mail cadastrado em sua conta, e enviaremos
+          um link com as instruções para recuperação.
+        </p>
+        <form onSubmit={handleForgotSubmit} noValidate>
+          <Input
+            label="Email"
+            name="forgotEmail"
+            type="email"
+            required
+            placeholder="exemplo@ufba.com"
+            value={forgotEmail}
+            onChange={(e) => setForgotEmail(e.target.value)}
+            error={forgotError}
+          />
+          <div className={styles.actions} style={{ marginTop: "1.5rem" }}>
+            <Button type="submit" variant="filled" color="primary" disabled={forgotSubmitting}>
+              {forgotSubmitting ? "Enviando..." : "Enviar"}
+            </Button>
+          </div>
+        </form>
+      </Modal>
+
+      <Modal isOpen={showForgotSuccess} onClose={() => setShowForgotSuccess(false)} title="Email enviado!" variant="success">
+        <p>Verifique sua caixa de entrada para redefinir sua senha.</p>
+        <div style={{ textAlign: "center", marginTop: "1rem" }}>
+          <Button variant="filled" color="primary" onClick={() => setShowForgotSuccess(false)}>
+            Ok
+          </Button>
+        </div>
+      </Modal>
     </div>
   );
 }

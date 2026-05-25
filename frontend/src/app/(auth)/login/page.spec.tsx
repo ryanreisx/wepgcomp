@@ -1,8 +1,10 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import LoginPage from "./page";
 import { useAuth } from "@/hooks/useAuth";
+import * as authService from "@/services/auth.service";
 
 jest.mock("@/hooks/useAuth");
+jest.mock("@/services/auth.service");
 jest.mock("next/navigation", () => ({
   useRouter: () => ({ push: mockPush }),
 }));
@@ -10,6 +12,7 @@ jest.mock("next/navigation", () => ({
 const mockPush = jest.fn();
 const mockLogin = jest.fn();
 const mockedUseAuth = useAuth as jest.MockedFunction<typeof useAuth>;
+const mockedAuthService = authService as jest.Mocked<typeof authService>;
 
 function setupAuth() {
   mockedUseAuth.mockReturnValue({
@@ -48,8 +51,8 @@ describe("LoginPage", () => {
     fireEvent.click(screen.getByRole("button", { name: /Entrar/ }));
 
     await waitFor(() => {
-      expect(screen.getByText("Email é obrigatório")).toBeInTheDocument();
-      expect(screen.getByText("Senha é obrigatória")).toBeInTheDocument();
+      expect(screen.getByText("Verifique seu email")).toBeInTheDocument();
+      expect(screen.getByText("Verifique sua senha")).toBeInTheDocument();
     });
 
     expect(mockLogin).not.toHaveBeenCalled();
@@ -124,6 +127,81 @@ describe("LoginPage", () => {
       expect(
         screen.getByText("Erro ao fazer login. Tente novamente.")
       ).toBeInTheDocument();
+    });
+  });
+
+  describe("forgot password modal", () => {
+    it("opens modal on click", () => {
+      render(<LoginPage />);
+      fireEvent.click(screen.getByText("Esqueceu sua senha"));
+      expect(screen.getByText("Esqueci minha Senha")).toBeInTheDocument();
+    });
+
+    it("shows description text", () => {
+      render(<LoginPage />);
+      fireEvent.click(screen.getByText("Esqueceu sua senha"));
+      expect(
+        screen.getByText(/informe o e-mail cadastrado/)
+      ).toBeInTheDocument();
+    });
+
+    it("sends forgot password request", async () => {
+      mockedAuthService.forgotPassword.mockResolvedValue({
+        data: { message: "ok" },
+      } as never);
+
+      render(<LoginPage />);
+      fireEvent.click(screen.getByText("Esqueceu sua senha"));
+
+      const emailInputs = screen.getAllByLabelText(/Email/);
+      fireEvent.change(emailInputs[1], {
+        target: { value: "user@test.com" },
+      });
+      fireEvent.click(screen.getByRole("button", { name: /Enviar/ }));
+
+      await waitFor(() => {
+        expect(mockedAuthService.forgotPassword).toHaveBeenCalledWith(
+          "user@test.com"
+        );
+      });
+    });
+
+    it("shows success modal after sending", async () => {
+      mockedAuthService.forgotPassword.mockResolvedValue({
+        data: { message: "ok" },
+      } as never);
+
+      render(<LoginPage />);
+      fireEvent.click(screen.getByText("Esqueceu sua senha"));
+
+      const emailInputs = screen.getAllByLabelText(/Email/);
+      fireEvent.change(emailInputs[1], {
+        target: { value: "user@test.com" },
+      });
+      fireEvent.click(screen.getByRole("button", { name: /Enviar/ }));
+
+      await waitFor(() => {
+        expect(screen.getByText("Email enviado!")).toBeInTheDocument();
+      });
+    });
+
+    it("shows error on forgot password failure", async () => {
+      mockedAuthService.forgotPassword.mockRejectedValue({
+        response: { data: { message: "Email não encontrado" } },
+      });
+
+      render(<LoginPage />);
+      fireEvent.click(screen.getByText("Esqueceu sua senha"));
+
+      const emailInputs = screen.getAllByLabelText(/Email/);
+      fireEvent.change(emailInputs[1], {
+        target: { value: "user@test.com" },
+      });
+      fireEvent.click(screen.getByRole("button", { name: /Enviar/ }));
+
+      await waitFor(() => {
+        expect(screen.getByText("Email não encontrado")).toBeInTheDocument();
+      });
     });
   });
 });
