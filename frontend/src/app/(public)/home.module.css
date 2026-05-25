@@ -1,0 +1,436 @@
+/* === Hero === */
+.hero {
+  position: relative;
+  min-height: 500px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background-image: url('/images/hero-salvador.jpg');
+  background-size: cover;
+  background-position: center;
+  background-color: #054b75;
+}
+
+.heroOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, #3d6b82 0%, #c04040 100%);
+  opacity: 0.75;
+}
+
+.heroContent {
+  position: relative;
+  z-index: 1;
+  padding: 4rem 1rem;
+  color: #ffffff;
+}
+
+.heroTitle {
+  font-family: var(--font-poppins);
+  font-weight: 700;
+  font-size: 3.5rem;
+  color: #ffffff;
+  margin: 0 0 1rem;
+}
+
+.heroSubtitle {
+  font-family: var(--font-poppins);
+  font-weight: 400;
+  font-size: 1.125rem;
+  color: #ffffff;
+  max-width: 600px;
+  margin: 0 auto 0.75rem;
+  opacity: 0.95;
+}
+
+.heroDate {
+  font-family: var(--font-poppins);
+  font-weight: 400;
+  font-size: 1rem;
+  color: #ffffff;
+  margin: 0 0 1.5rem;
+  opacity: 0.9;
+}
+
+.heroCta {
+  display: inline-block;
+  font-family: var(--font-poppins);
+  font-weight: 500;
+  font-size: 1rem;
+  color: #ffffff;
+  border: 2px solid #ffffff;
+  border-radius: 50px;
+  padding: 0.625rem 2rem;
+  text-decoration: none;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.heroCta:hover {
+  background-color: #ffffff;
+  color: #054b75;
+}
+
+/* === Section Titles === */
+.sectionTitle {
+  font-family: var(--font-poppins);
+  font-weight: 700;
+  font-size: 2.5rem;
+  color: #0066ba;
+  text-align: center;
+  margin: 0 0 1rem;
+}
+
+.sectionTitleDark {
+  font-family: var(--font-poppins);
+  font-weight: 700;
+  font-size: 2.5rem;
+  color: #054b75;
+  text-align: center;
+  margin: 0 0 2rem;
+}
+
+/* === Programação === */
+.programacao {
+  padding: 4rem 0;
+  background-color: #ffffff;
+}
+
+.programacaoSubtitle {
+  font-family: var(--font-poppins);
+  font-weight: 400;
+  font-size: 0.9375rem;
+  color: #555555;
+  text-align: center;
+  margin: 0 0 2rem;
+}
+
+.programacaoTabs {
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.scheduleContainer {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.roomHeader {
+  background-color: #0066ba;
+  color: #ffffff;
+  font-family: var(--font-poppins);
+  font-weight: 600;
+  font-size: 0.875rem;
+  text-align: center;
+  padding: 0.5rem 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.scheduleRow {
+  display: flex;
+  align-items: stretch;
+  border-bottom: 1px solid #d4d4d4;
+}
+
+.scheduleTime {
+  font-family: var(--font-poppins);
+  font-weight: 500;
+  font-size: 0.875rem;
+  color: #2a2a2a;
+  width: 60px;
+  flex-shrink: 0;
+  padding: 0.75rem 0;
+  display: flex;
+  align-items: center;
+}
+
+.scheduleCard {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-left: 3px solid #ffa90f;
+  margin: 0.5rem 0;
+}
+
+.scheduleCardGeneral {
+  border-left: none;
+  justify-content: center;
+  text-align: center;
+}
+
+.presenterAvatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: #d4d4d4;
+  flex-shrink: 0;
+}
+
+.presenterName {
+  font-family: var(--font-poppins);
+  font-weight: 600;
+  font-size: 0.8125rem;
+  color: #2a2a2a;
+  margin: 0;
+}
+
+.presenterTitle {
+  font-family: var(--font-poppins);
+  font-weight: 400;
+  font-size: 0.75rem;
+  color: #555555;
+  margin: 0;
+}
+
+.generalTitle {
+  font-family: var(--font-poppins);
+  font-weight: 500;
+  font-size: 0.875rem;
+  color: #2a2a2a;
+  margin: 0;
+}
+
+.generalSubtitle {
+  font-family: var(--font-poppins);
+  font-weight: 400;
+  font-size: 0.75rem;
+  color: #555555;
+  margin: 0.125rem 0 0;
+}
+
+/* === Orientações === */
+.orientacoes {
+  position: relative;
+  padding: 6rem 1rem;
+  background-color: #ffa90f;
+  clip-path: polygon(0 10%, 100% 0, 100% 90%, 0 100%);
+  margin: -2rem 0;
+}
+
+.orientacoesContent {
+  max-width: 800px;
+  margin: 0 auto;
+  text-align: center;
+  color: #ffffff;
+}
+
+.orientacoesTitle {
+  font-family: var(--font-poppins);
+  font-weight: 700;
+  font-size: 2.5rem;
+  margin: 0 0 1.5rem;
+}
+
+.orientacoesText {
+  font-family: var(--font-poppins);
+  font-weight: 400;
+  font-size: 1rem;
+  line-height: 1.6;
+  margin: 0 0 1.5rem;
+}
+
+.orientacoesDatesTitle {
+  font-family: var(--font-poppins);
+  font-weight: 700;
+  font-size: 1rem;
+  margin: 0 0 0.5rem;
+}
+
+.orientacoesList {
+  list-style: disc;
+  text-align: left;
+  display: inline-block;
+  font-family: var(--font-poppins);
+  font-weight: 400;
+  font-size: 1rem;
+  margin: 0 0 2rem;
+  padding-left: 1.5rem;
+}
+
+.orientacoesList li {
+  margin-bottom: 0.25rem;
+}
+
+.orientacoesBtn {
+  display: inline-block;
+  font-family: var(--font-poppins);
+  font-weight: 500;
+  font-size: 1rem;
+  color: #ffffff;
+  border: 2px solid #ffffff;
+  border-radius: 50px;
+  padding: 0.75rem 3rem;
+  text-decoration: none;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.orientacoesBtn:hover {
+  background-color: #ffffff;
+  color: #ffa90f;
+}
+
+/* === Organização === */
+.organizacao {
+  padding: 4rem 0;
+  background-color: #f5f5f5;
+}
+
+.orgList {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.orgItem {
+  font-family: var(--font-poppins);
+  font-weight: 400;
+  font-size: 1rem;
+  color: #2a2a2a;
+  margin: 0 0 1.5rem;
+  line-height: 1.5;
+}
+
+.orgRole {
+  font-weight: 700;
+  font-style: italic;
+  color: #ffa90f;
+}
+
+/* === Contato + Local === */
+.contatoLocal {
+  padding: 4rem 0;
+  background-color: #0066ba;
+  color: #ffffff;
+}
+
+.contatoTitle {
+  font-family: var(--font-poppins);
+  font-weight: 700;
+  font-size: 2rem;
+  color: #ffffff;
+  margin: 0 0 1.5rem;
+}
+
+.contatoForm {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.contatoLabel {
+  font-family: var(--font-poppins);
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: #ffffff;
+  display: block;
+  margin-bottom: 0.375rem;
+}
+
+.contatoInput {
+  width: 100%;
+  padding: 0.625rem 0.75rem;
+  background-color: transparent;
+  border: 1.5px solid #ffffff;
+  border-radius: 4px;
+  color: #ffffff;
+  font-family: var(--font-poppins);
+  font-size: 0.875rem;
+  box-sizing: border-box;
+}
+
+.contatoInput::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.contatoTextarea {
+  width: 100%;
+  padding: 0.625rem 0.75rem;
+  background-color: transparent;
+  border: 1.5px solid #ffffff;
+  border-radius: 4px;
+  color: #ffffff;
+  font-family: var(--font-poppins);
+  font-size: 0.875rem;
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+.contatoTextarea::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.contatoSubmit {
+  background-color: #ffffff;
+  color: #0066ba;
+  font-family: var(--font-poppins);
+  font-weight: 600;
+  font-size: 1rem;
+  border: none;
+  border-radius: 50px;
+  padding: 0.75rem 2rem;
+  cursor: pointer;
+  width: 100%;
+  transition: opacity 0.2s;
+}
+
+.contatoSubmit:hover {
+  opacity: 0.9;
+}
+
+.localAddress {
+  font-family: var(--font-poppins);
+  font-weight: 400;
+  font-size: 0.9375rem;
+  color: #ffffff;
+  line-height: 1.6;
+  margin: 0 0 1rem;
+}
+
+.localEmail {
+  font-family: var(--font-poppins);
+  font-weight: 400;
+  font-size: 0.9375rem;
+  color: #ffffff;
+  margin: 0 0 1.5rem;
+}
+
+.localMap {
+  width: 100%;
+  height: 200px;
+  border-radius: 8px;
+  border: none;
+  object-fit: cover;
+}
+
+/* === Responsive === */
+@media (max-width: 768px) {
+  .hero {
+    min-height: 350px;
+  }
+
+  .heroTitle {
+    font-size: 2.25rem;
+  }
+
+  .heroSubtitle {
+    font-size: 1rem;
+  }
+
+  .sectionTitle,
+  .sectionTitleDark,
+  .orientacoesTitle {
+    font-size: 2rem;
+  }
+
+  .orientacoes {
+    clip-path: polygon(0 5%, 100% 0, 100% 95%, 0 100%);
+    padding: 4rem 1rem;
+  }
+
+  .contatoTitle {
+    font-size: 1.5rem;
+  }
+}
