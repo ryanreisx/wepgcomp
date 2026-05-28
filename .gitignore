@@ -37,5 +37,8 @@ backend/uploads/
 
 # Docker
 docker-compose.override.yml
-.claude/settings.json 
-.claude/settings.json 
+.claude/settings.json
+.claude/settings.json
+
+# Figma MCP screenshots
+figma-screenshots/
