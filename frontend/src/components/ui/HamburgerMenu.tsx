@@ -14,28 +14,27 @@ interface MenuItem {
 
 const MENU_ITEMS: Record<Exclude<View, "public">, MenuItem[]> = {
   superadmin: [
-    { label: "Sessões", href: "/dashboard/sessoes" },
-    { label: "Apresentações", href: "/dashboard/apresentacoes" },
-    { label: "Edição do Evento", href: "/dashboard/edicao-evento" },
-    { label: "Premiação", href: "/dashboard/premiacao" },
-    { label: "Usuários", href: "/dashboard/usuarios" },
-    { label: "Emitir Certificado", href: "/dashboard/certificados" },
+    { label: "Sessões", href: "/superadmin/sessoes" },
+    { label: "Apresentações", href: "/superadmin/apresentacoes" },
+    { label: "Edições do Evento", href: "/superadmin/edicoes" },
+    { label: "Premiação", href: "/superadmin/premiacao" },
+    { label: "Usuários", href: "/superadmin/usuarios" },
+    { label: "Emitir Certificado", href: "/certificados" },
   ],
   committee: [
-    { label: "Sessões", href: "/dashboard/sessoes" },
-    { label: "Apresentações", href: "/dashboard/apresentacoes" },
-    { label: "Edição do Evento", href: "/dashboard/edicao-evento" },
-    { label: "Premiação", href: "/dashboard/premiacao" },
-    { label: "Emitir Certificado", href: "/dashboard/certificados" },
+    { label: "Sessões", href: "/comissao/sessoes" },
+    { label: "Apresentações", href: "/comissao/apresentacoes" },
+    { label: "Edição do Evento", href: "/comissao/edicao" },
+    { label: "Premiação", href: "/comissao/premiacao" },
+    { label: "Emitir Certificado", href: "/certificados" },
   ],
   student: [
-    { label: "Apresentações (Minhas)", href: "/dashboard/minhas-apresentacoes" },
-    { label: "Emitir Certificado", href: "/dashboard/certificados" },
+    { label: "Minhas Apresentações", href: "/aluno/apresentacoes" },
+    { label: "Emitir Certificado", href: "/certificados" },
   ],
   listener: [
-    { label: "Avaliação", href: "/dashboard/avaliacao" },
-    { label: "Favoritos", href: "/dashboard/favoritos" },
-    { label: "Emitir Certificado", href: "/dashboard/certificados" },
+    { label: "Avaliação", href: "/ouvinte/avaliacao" },
+    { label: "Emitir Certificado", href: "/certificados" },
   ],
 };
 
