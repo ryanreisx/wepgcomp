@@ -2,15 +2,20 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import Home from "./page";
 import * as eventEditionService from "@/services/event-edition.service";
 import * as presentationService from "@/services/presentation.service";
+import * as contactService from "@/services/contact.service";
 
 jest.mock("@/services/event-edition.service");
 jest.mock("@/services/presentation.service");
+jest.mock("@/services/contact.service");
 
 const mockedEventService = eventEditionService as jest.Mocked<
   typeof eventEditionService
 >;
 const mockedPresentationService = presentationService as jest.Mocked<
   typeof presentationService
+>;
+const mockedContactService = contactService as jest.Mocked<
+  typeof contactService
 >;
 
 const mockEdition = {
@@ -229,5 +234,183 @@ describe("Home Page", () => {
     expect(
       screen.getByRole("button", { name: "Enviar" })
     ).toBeInTheDocument();
+  });
+
+  describe("Contact form integration", () => {
+    function fillForm(name: string, email: string, message: string) {
+      if (name) {
+        fireEvent.change(screen.getByLabelText("Nome:"), {
+          target: { value: name },
+        });
+      }
+      if (email) {
+        fireEvent.change(screen.getByLabelText("E-mail:"), {
+          target: { value: email },
+        });
+      }
+      if (message) {
+        fireEvent.change(screen.getByLabelText("Mensagem:"), {
+          target: { value: message },
+        });
+      }
+    }
+
+    it("shows validation error when name is empty", async () => {
+      render(<Home />);
+      await waitFor(() => {
+        expect(screen.getByText("WEPGCOMP 2024")).toBeInTheDocument();
+      });
+
+      fillForm("", "test@email.com", "Hello");
+      fireEvent.click(screen.getByRole("button", { name: "Enviar" }));
+
+      expect(screen.getByText("Informe seu nome.")).toBeInTheDocument();
+      expect(mockedContactService.sendContact).not.toHaveBeenCalled();
+    });
+
+    it("shows validation error when email is invalid", async () => {
+      render(<Home />);
+      await waitFor(() => {
+        expect(screen.getByText("WEPGCOMP 2024")).toBeInTheDocument();
+      });
+
+      fillForm("João", "invalid-email", "Hello");
+      fireEvent.click(screen.getByRole("button", { name: "Enviar" }));
+
+      expect(
+        screen.getByText("Informe um e-mail válido.")
+      ).toBeInTheDocument();
+      expect(mockedContactService.sendContact).not.toHaveBeenCalled();
+    });
+
+    it("shows validation error when message is empty", async () => {
+      render(<Home />);
+      await waitFor(() => {
+        expect(screen.getByText("WEPGCOMP 2024")).toBeInTheDocument();
+      });
+
+      fillForm("João", "joao@email.com", "");
+      fireEvent.click(screen.getByRole("button", { name: "Enviar" }));
+
+      expect(screen.getByText("Informe sua mensagem.")).toBeInTheDocument();
+      expect(mockedContactService.sendContact).not.toHaveBeenCalled();
+    });
+
+    it("shows all validation errors at once", async () => {
+      render(<Home />);
+      await waitFor(() => {
+        expect(screen.getByText("WEPGCOMP 2024")).toBeInTheDocument();
+      });
+
+      fireEvent.click(screen.getByRole("button", { name: "Enviar" }));
+
+      expect(screen.getByText("Informe seu nome.")).toBeInTheDocument();
+      expect(
+        screen.getByText("Informe um e-mail válido.")
+      ).toBeInTheDocument();
+      expect(screen.getByText("Informe sua mensagem.")).toBeInTheDocument();
+    });
+
+    it("shows success modal and clears form on 202", async () => {
+      mockedContactService.sendContact.mockResolvedValue({
+        data: { message: "Mensagem enviada com sucesso" },
+      } as never);
+
+      render(<Home />);
+      await waitFor(() => {
+        expect(screen.getByText("WEPGCOMP 2024")).toBeInTheDocument();
+      });
+
+      fillForm("João", "joao@email.com", "Olá!");
+      fireEvent.click(screen.getByRole("button", { name: "Enviar" }));
+
+      await waitFor(() => {
+        expect(screen.getByText("Salvo com Sucesso!")).toBeInTheDocument();
+      });
+
+      expect(mockedContactService.sendContact).toHaveBeenCalledWith({
+        name: "João",
+        email: "joao@email.com",
+        message: "Olá!",
+      });
+
+      const nameInput = screen.getByLabelText("Nome:") as HTMLInputElement;
+      expect(nameInput.value).toBe("");
+    });
+
+    it("shows error modal on 503 response", async () => {
+      mockedContactService.sendContact.mockRejectedValue({
+        response: {
+          status: 503,
+          data: { message: "Formulário indisponível no momento" },
+        },
+      });
+
+      render(<Home />);
+      await waitFor(() => {
+        expect(screen.getByText("WEPGCOMP 2024")).toBeInTheDocument();
+      });
+
+      fillForm("João", "joao@email.com", "Olá!");
+      fireEvent.click(screen.getByRole("button", { name: "Enviar" }));
+
+      await waitFor(() => {
+        expect(screen.getByText("Algo deu errado!")).toBeInTheDocument();
+      });
+
+      expect(
+        screen.getByText(
+          "Formulário indisponível no momento. Tente mais tarde."
+        )
+      ).toBeInTheDocument();
+    });
+
+    it("shows inline errors on 400 response", async () => {
+      mockedContactService.sendContact.mockRejectedValue({
+        response: {
+          status: 400,
+          data: {
+            message: [
+              "name should not be empty",
+              "email must be an email",
+            ],
+          },
+        },
+      });
+
+      render(<Home />);
+      await waitFor(() => {
+        expect(screen.getByText("WEPGCOMP 2024")).toBeInTheDocument();
+      });
+
+      fillForm("João", "joao@email.com", "Olá!");
+      fireEvent.click(screen.getByRole("button", { name: "Enviar" }));
+
+      await waitFor(() => {
+        expect(
+          screen.getByText("name should not be empty")
+        ).toBeInTheDocument();
+      });
+      expect(
+        screen.getByText("email must be an email")
+      ).toBeInTheDocument();
+    });
+
+    it("disables submit button while sending", async () => {
+      mockedContactService.sendContact.mockReturnValue(
+        new Promise(() => {}) as never
+      );
+
+      render(<Home />);
+      await waitFor(() => {
+        expect(screen.getByText("WEPGCOMP 2024")).toBeInTheDocument();
+      });
+
+      fillForm("João", "joao@email.com", "Olá!");
+      fireEvent.click(screen.getByRole("button", { name: "Enviar" }));
+
+      const btn = screen.getByRole("button", { name: "Enviando..." });
+      expect(btn).toBeDisabled();
+    });
   });
 });

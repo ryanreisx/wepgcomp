@@ -362,6 +362,14 @@
   color: rgba(255, 255, 255, 0.6);
 }
 
+.contatoError {
+  display: block;
+  font-family: var(--font-poppins);
+  font-size: 0.75rem;
+  color: #ff1a25;
+  margin-top: 0.25rem;
+}
+
 .contatoSubmit {
   background-color: #ffffff;
   color: #0066ba;
@@ -376,8 +384,13 @@
   transition: opacity 0.2s;
 }
 
-.contatoSubmit:hover {
+.contatoSubmit:hover:not(:disabled) {
   opacity: 0.9;
+}
+
+.contatoSubmit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .localAddress {

@@ -3,8 +3,10 @@
 import { useState, useEffect, FormEvent } from "react";
 import Link from "next/link";
 import Tabs from "@/components/ui/Tabs";
+import Modal from "@/components/ui/Modal";
 import * as eventEditionService from "@/services/event-edition.service";
 import * as presentationService from "@/services/presentation.service";
+import { sendContact } from "@/services/contact.service";
 import { EventEdition } from "@/types/event-edition";
 import { PresentationBlock } from "@/types/presentation";
 import styles from "./home.module.css";
@@ -44,6 +46,12 @@ export default function Home() {
   const [contactName, setContactName] = useState("");
   const [contactEmail, setContactEmail] = useState("");
   const [contactMessage, setContactMessage] = useState("");
+  const [contactErrors, setContactErrors] = useState<Record<string, string>>(
+    {}
+  );
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [successModalOpen, setSuccessModalOpen] = useState(false);
+  const [errorModalOpen, setErrorModalOpen] = useState(false);
 
   useEffect(() => {
     async function loadData() {
@@ -75,8 +83,63 @@ export default function Home() {
     ? new Date(edition.startDate).getFullYear()
     : new Date().getFullYear();
 
-  function handleContactSubmit(e: FormEvent) {
+  async function handleContactSubmit(e: FormEvent) {
     e.preventDefault();
+
+    const errors: Record<string, string> = {};
+    if (!contactName.trim()) {
+      errors.name = "Informe seu nome.";
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!contactEmail.trim() || !emailRegex.test(contactEmail.trim())) {
+      errors.email = "Informe um e-mail válido.";
+    }
+    if (!contactMessage.trim()) {
+      errors.message = "Informe sua mensagem.";
+    }
+
+    if (Object.keys(errors).length > 0) {
+      setContactErrors(errors);
+      return;
+    }
+
+    setContactErrors({});
+    setIsSubmitting(true);
+
+    try {
+      await sendContact({
+        name: contactName.trim(),
+        email: contactEmail.trim(),
+        message: contactMessage.trim(),
+      });
+      setContactName("");
+      setContactEmail("");
+      setContactMessage("");
+      setSuccessModalOpen(true);
+    } catch (err: unknown) {
+      const resp = (err as { response?: { status?: number; data?: { message?: string | string[] } } })?.response;
+      if (resp?.status === 400 && Array.isArray(resp.data?.message)) {
+        const fieldErrors: Record<string, string> = {};
+        for (const msg of resp.data.message as string[]) {
+          if (msg.toLowerCase().includes("name")) {
+            fieldErrors.name = fieldErrors.name || msg;
+          } else if (msg.toLowerCase().includes("email")) {
+            fieldErrors.email = fieldErrors.email || msg;
+          } else if (msg.toLowerCase().includes("message")) {
+            fieldErrors.message = fieldErrors.message || msg;
+          }
+        }
+        setContactErrors(
+          Object.keys(fieldErrors).length > 0
+            ? fieldErrors
+            : { general: (resp.data.message as string[]).join(", ") }
+        );
+      } else {
+        setErrorModalOpen(true);
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -234,6 +297,24 @@ export default function Home() {
         </div>
       </section>
 
+      <Modal
+        isOpen={successModalOpen}
+        onClose={() => setSuccessModalOpen(false)}
+        title="Salvo com Sucesso!"
+        variant="success"
+      >
+        <p>Sua mensagem foi enviada com sucesso.</p>
+      </Modal>
+
+      <Modal
+        isOpen={errorModalOpen}
+        onClose={() => setErrorModalOpen(false)}
+        title="Algo deu errado!"
+        variant="error"
+      >
+        <p>Formulário indisponível no momento. Tente mais tarde.</p>
+      </Modal>
+
       {/* Contato + Local */}
       <section className={styles.contatoLocal} data-testid="contato-section">
         <div className="container">
@@ -243,6 +324,7 @@ export default function Home() {
               <form
                 className={styles.contatoForm}
                 onSubmit={handleContactSubmit}
+                noValidate
               >
                 <div className="row">
                   <div className="col-6">
@@ -260,6 +342,11 @@ export default function Home() {
                       value={contactName}
                       onChange={(e) => setContactName(e.target.value)}
                     />
+                    {contactErrors.name && (
+                      <span className={styles.contatoError}>
+                        {contactErrors.name}
+                      </span>
+                    )}
                   </div>
                   <div className="col-6">
                     <label
@@ -276,6 +363,11 @@ export default function Home() {
                       value={contactEmail}
                       onChange={(e) => setContactEmail(e.target.value)}
                     />
+                    {contactErrors.email && (
+                      <span className={styles.contatoError}>
+                        {contactErrors.email}
+                      </span>
+                    )}
                   </div>
                 </div>
                 <div>
@@ -293,9 +385,23 @@ export default function Home() {
                     value={contactMessage}
                     onChange={(e) => setContactMessage(e.target.value)}
                   />
+                  {contactErrors.message && (
+                    <span className={styles.contatoError}>
+                      {contactErrors.message}
+                    </span>
+                  )}
                 </div>
-                <button type="submit" className={styles.contatoSubmit}>
-                  Enviar
+                {contactErrors.general && (
+                  <span className={styles.contatoError}>
+                    {contactErrors.general}
+                  </span>
+                )}
+                <button
+                  type="submit"
+                  className={styles.contatoSubmit}
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? "Enviando..." : "Enviar"}
                 </button>
               </form>
             </div>
