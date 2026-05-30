@@ -1,0 +1,95 @@
+.container {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.presentationCard {
+  display: flex;
+  align-items: center;
+  padding: 1rem 1.25rem;
+  border: 2px solid #ffa90f;
+  border-radius: 8px;
+  background-color: #ffffff;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.avatarPlaceholder {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background-color: #0066ba;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-poppins);
+  font-weight: 600;
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.cardInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.authorName {
+  font-family: var(--font-poppins);
+  font-weight: 700;
+  font-size: 1rem;
+  color: #2a2a2a;
+  margin: 0;
+}
+
+.submissionTitle {
+  font-family: var(--font-poppins);
+  font-weight: 400;
+  font-size: 0.875rem;
+  color: #555555;
+  margin: 0.25rem 0 0;
+}
+
+.criteriaList {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.criterionItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.criterionLabel {
+  font-family: var(--font-poppins);
+  font-weight: 500;
+  font-size: 1rem;
+  color: #2a2a2a;
+  text-align: center;
+}
+
+.validationError {
+  text-align: center;
+  font-family: var(--font-poppins);
+  font-size: 0.875rem;
+  color: #ff1a25;
+  margin-bottom: 1rem;
+}
+
+.actions {
+  display: flex;
+  justify-content: center;
+}
+
+.loading {
+  text-align: center;
+  font-family: var(--font-poppins);
+  font-size: 1rem;
+  color: #555555;
+  padding: 2rem 0;
+}
