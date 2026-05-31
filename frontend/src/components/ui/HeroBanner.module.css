@@ -8,6 +8,34 @@
   background-size: cover;
   background-position: center;
   background-color: #054b75;
+  overflow: hidden;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  bottom: -30px;
+  left: -5%;
+  width: 110%;
+  height: 80px;
+  background: linear-gradient(90deg, transparent 35%, #0066ba 60%, #2d9ee0 100%);
+  transform: rotate(-4deg);
+  transform-origin: bottom left;
+  z-index: 2;
+}
+
+.hero::after {
+  content: '';
+  position: absolute;
+  bottom: -30px;
+  left: -5%;
+  width: 110%;
+  height: 80px;
+  background: #ffffff;
+  transform: rotate(-3deg);
+  transform-origin: bottom left;
+  z-index: 3;
+  border-radius: 0 8px 0 0;
 }
 
 .overlay {
@@ -23,8 +51,8 @@
 
 .content {
   position: relative;
-  z-index: 1;
-  padding: 3rem 1rem;
+  z-index: 5;
+  padding: 3rem 1rem 4rem;
   color: #ffffff;
 }
 

@@ -20,6 +20,8 @@ const defaultUser = {
   email: "u@e.com",
   profile: "DoctoralStudent" as const,
   level: "Default" as const,
+  isActive: true,
+  isVerified: true,
   isCommitteeOfActiveEdition: false,
 };
 

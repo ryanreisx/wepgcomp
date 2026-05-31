@@ -1,5 +1,5 @@
 import api from "./api";
-import { Presentation, PresentationBlock } from "@/types/presentation";
+import { Presentation, PresentationBlock, RankingEntry } from "@/types/presentation";
 
 export const createPresentationBlock = (dto: {
   eventEditionId: string;
@@ -55,7 +55,7 @@ export const getRanking = (
   eventEditionId: string,
   type: "public" | "panelists" | "all"
 ) =>
-  api.get<{ data: Presentation[] }>("/presentations/ranking", {
+  api.get<{ data: RankingEntry[] }>("/presentations/ranking", {
     params: { eventEditionId, type },
   });
 

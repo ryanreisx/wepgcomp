@@ -22,8 +22,20 @@
   flex-wrap: wrap;
 }
 
-.logoImg {
-  height: 45px;
+.logoImgRealizacao {
+  height: 70px;
+  width: auto;
+  object-fit: contain;
+}
+
+.logoImgUfba {
+  height: 50px;
+  width: auto;
+  object-fit: contain;
+}
+
+.logoImgJusbrasil {
+  height: 28px;
   width: auto;
   object-fit: contain;
 }

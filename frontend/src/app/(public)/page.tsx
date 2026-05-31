@@ -39,6 +39,21 @@ function groupBlocksByDate(
   return groups;
 }
 
+const HERO_SLIDES = [
+  {
+    bg: "/images/hero-salvador.jpg",
+    overlay: "linear-gradient(135deg, #3d6b82 0%, #c04040 100%)",
+  },
+  {
+    bg: "/images/hero-carousel-2.png",
+    overlay: "linear-gradient(135deg, #a03040 0%, #c0a030 100%)",
+  },
+  {
+    bg: "/images/hero-carousel-3.png",
+    overlay: "linear-gradient(135deg, #b09030 0%, #4a7090 100%)",
+  },
+];
+
 export default function Home() {
   const [edition, setEdition] = useState<EventEdition | null>(null);
   const [blocks, setBlocks] = useState<PresentationBlock[]>([]);
@@ -52,6 +67,14 @@ export default function Home() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successModalOpen, setSuccessModalOpen] = useState(false);
   const [errorModalOpen, setErrorModalOpen] = useState(false);
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % HERO_SLIDES.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, []);
 
   useEffect(() => {
     async function loadData() {
@@ -146,7 +169,18 @@ export default function Home() {
     <>
       {/* Hero */}
       <section className={styles.hero} data-testid="hero-section">
-        <div className={styles.heroOverlay} />
+        {HERO_SLIDES.map((slide, index) => (
+          <div
+            key={index}
+            className={`${styles.heroSlide} ${index === currentSlide ? styles.heroSlideActive : ""}`}
+            style={{ backgroundImage: `url(${slide.bg})` }}
+          >
+            <div
+              className={styles.heroOverlay}
+              style={{ background: slide.overlay }}
+            />
+          </div>
+        ))}
         <div className={styles.heroContent}>
           <h1 className={styles.heroTitle}>
             {edition?.name || `WEPGCOMP ${editionYear}`}
@@ -165,6 +199,18 @@ export default function Home() {
             Confira a Programação
           </Link>
         </div>
+        <div className={styles.heroIndicators}>
+          {HERO_SLIDES.map((_, index) => (
+            <button
+              key={index}
+              className={`${styles.heroIndicator} ${index === currentSlide ? styles.heroIndicatorActive : ""}`}
+              onClick={() => setCurrentSlide(index)}
+              aria-label={`Slide ${index + 1}`}
+            />
+          ))}
+        </div>
+        <div className={styles.heroDiagonalBlue} />
+        <div className={styles.heroDiagonalWhite} />
       </section>
 
       {/* Programação */}
@@ -415,6 +461,14 @@ export default function Home() {
                 CEP 40.170-110, Salvador - Bahia.
               </p>
               <p className={styles.localEmail}>E-mail: ceapg-ic@ufba.br</p>
+              <iframe
+                className={styles.localMap}
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3887.9981847964584!2d-38.50827!3d-13.001389!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x71604d2481ae5c7%3A0x39d0b57af3de8592!2sInstituto%20de%20Computa%C3%A7%C3%A3o%20(IC%2FUFBA)!5e0!3m2!1spt-BR!2sbr!4v1717000000000"
+                allowFullScreen
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                title="Localização do Instituto de Computação da UFBA"
+              />
             </div>
           </div>
         </div>

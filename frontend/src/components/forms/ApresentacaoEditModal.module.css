@@ -1,0 +1,152 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.authorHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.authorPhoto {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.authorPhotoPlaceholder {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background-color: #0066ba;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-poppins);
+  font-weight: 600;
+  font-size: 1.25rem;
+}
+
+.authorInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.authorLabel {
+  font-family: var(--font-poppins);
+  font-size: 0.8125rem;
+  color: #555555;
+}
+
+.authorName {
+  font-family: var(--font-poppins);
+  font-weight: 700;
+  font-size: 1rem;
+  color: #2a2a2a;
+}
+
+.fieldGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  width: 100%;
+}
+
+.label {
+  font-family: var(--font-poppins);
+  font-weight: 500;
+  font-size: 0.875rem;
+  color: #2a2a2a;
+}
+
+.asterisk {
+  color: #ff1a25;
+}
+
+.textarea {
+  width: 100%;
+  padding: 0.625rem 0.75rem;
+  border: 1px solid #aaaaaa;
+  border-radius: 8px;
+  font-family: var(--font-poppins);
+  font-size: 1rem;
+  color: #2a2a2a;
+  background-color: #ffffff;
+  resize: vertical;
+  transition: border-color 0.2s;
+}
+
+.textarea:focus {
+  outline: none;
+  border-color: #0066ba;
+  box-shadow: 0 0 0 2px rgba(0, 102, 186, 0.15);
+}
+
+.textareaError {
+  border-color: #ff1a25;
+}
+
+.textareaError:focus {
+  border-color: #ff1a25;
+  box-shadow: 0 0 0 2px rgba(255, 26, 37, 0.15);
+}
+
+.select {
+  width: 100%;
+  padding: 0.625rem 0.75rem;
+  border: 1px solid #aaaaaa;
+  border-radius: 8px;
+  font-family: var(--font-poppins);
+  font-size: 1rem;
+  color: #2a2a2a;
+  background-color: #ffffff;
+  transition: border-color 0.2s;
+  appearance: auto;
+}
+
+.select:focus {
+  outline: none;
+  border-color: #0066ba;
+  box-shadow: 0 0 0 2px rgba(0, 102, 186, 0.15);
+}
+
+.selectError {
+  border-color: #ff1a25;
+}
+
+.selectError:focus {
+  border-color: #ff1a25;
+  box-shadow: 0 0 0 2px rgba(255, 26, 37, 0.15);
+}
+
+.fileInput {
+  width: 100%;
+  font-family: var(--font-poppins);
+  font-size: 0.9375rem;
+  color: #2a2a2a;
+}
+
+.currentFile {
+  font-family: var(--font-poppins);
+  font-size: 0.8125rem;
+  color: #555555;
+  margin-top: 0.125rem;
+}
+
+.error {
+  font-size: 0.8125rem;
+  color: #ff1a25;
+  margin-top: 0.125rem;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}

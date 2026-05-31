@@ -1,0 +1,142 @@
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.search {
+  margin-bottom: 1rem;
+}
+
+.filters {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.statusInfo {
+  font-family: var(--font-poppins);
+  font-size: 0.8125rem;
+  color: #555555;
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
+}
+
+.statusInfo p {
+  margin: 0;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.userCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.875rem 1rem;
+  border: 2px solid #ffa90f;
+  border-radius: 8px;
+  background-color: #ffffff;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.userCardChanged {
+  border-color: #0066ba;
+  box-shadow: 0 0 0 2px rgba(0, 102, 186, 0.1);
+}
+
+.userName {
+  font-family: var(--font-poppins);
+  font-weight: 700;
+  font-size: 0.9375rem;
+  color: #2a2a2a;
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.userControls {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.controlGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.controlLabel {
+  font-family: var(--font-poppins);
+  font-weight: 500;
+  font-size: 0.6875rem;
+  color: #7f7f7f;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.select {
+  padding: 0.375rem 0.5rem;
+  border: 1px solid #aaaaaa;
+  border-radius: 6px;
+  font-family: var(--font-poppins);
+  font-size: 0.8125rem;
+  color: #2a2a2a;
+  background-color: #ffffff;
+  appearance: auto;
+  min-width: 140px;
+}
+
+.select:focus {
+  outline: none;
+  border-color: #0066ba;
+  box-shadow: 0 0 0 2px rgba(0, 102, 186, 0.15);
+}
+
+.saveWrapper {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.loading {
+  text-align: center;
+  font-family: var(--font-poppins);
+  font-size: 1rem;
+  color: #555555;
+  padding: 2rem 0;
+}
+
+.empty {
+  text-align: center;
+  font-family: var(--font-poppins);
+  font-size: 1rem;
+  color: #7f7f7f;
+  padding: 2rem 0;
+}
+
+@media (max-width: 576px) {
+  .userCard {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .userControls {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .select {
+    min-width: unset;
+    width: 100%;
+  }
+}

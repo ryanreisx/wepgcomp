@@ -37,9 +37,9 @@ export default function Footer({
                 <Image
                   src="/images/logo-computacao-ufba.webp"
                   alt="Computação UFBA"
-                  width={140}
-                  height={45}
-                  className={styles.logoImg}
+                  width={220}
+                  height={70}
+                  className={styles.logoImgRealizacao}
                   unoptimized
                 />
               </div>
@@ -50,17 +50,17 @@ export default function Footer({
                 <Image
                   src="/images/logo-ufba.svg"
                   alt="UFBA"
-                  width={80}
-                  height={48}
-                  className={styles.logoImg}
+                  width={60}
+                  height={50}
+                  className={styles.logoImgUfba}
                   unoptimized
                 />
                 <Image
                   src="/images/logo-jusbrasil.png"
                   alt="Jusbrasil"
                   width={100}
-                  height={32}
-                  className={styles.logoImg}
+                  height={28}
+                  className={styles.logoImgJusbrasil}
                   unoptimized
                 />
               </div>

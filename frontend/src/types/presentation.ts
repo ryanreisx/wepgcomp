@@ -35,3 +35,10 @@ export interface Panelist {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface RankingEntry {
+  submissionId: string;
+  title: string;
+  authorName: string;
+  averageScore: number;
+}

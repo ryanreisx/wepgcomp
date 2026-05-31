@@ -7,7 +7,10 @@ export interface User {
   email: string;
   profile: Profile;
   level: UserLevel;
+  isActive: boolean;
+  isVerified: boolean;
   isCommitteeOfActiveEdition: boolean;
+  photoFilePath?: string | null;
 }
 
 export interface RegisterData {

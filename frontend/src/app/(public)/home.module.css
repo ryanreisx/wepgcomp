@@ -6,24 +6,82 @@
   align-items: center;
   justify-content: center;
   text-align: center;
-  background-image: url('/images/hero-salvador.jpg');
+  background-color: #054b75;
+  overflow: hidden;
+}
+
+.heroSlide {
+  position: absolute;
+  inset: 0;
   background-size: cover;
   background-position: center;
-  background-color: #054b75;
+  opacity: 0;
+  transition: opacity 1s ease;
+  z-index: 0;
+}
+
+.heroSlideActive {
+  opacity: 1;
 }
 
 .heroOverlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, #3d6b82 0%, #c04040 100%);
   opacity: 0.75;
 }
 
 .heroContent {
   position: relative;
-  z-index: 1;
-  padding: 4rem 1rem;
+  z-index: 5;
+  padding: 4rem 1rem 5rem;
   color: #ffffff;
+}
+
+.heroIndicators {
+  position: absolute;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 14px;
+  z-index: 6;
+}
+
+.heroIndicator {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid #ffffff;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+  transition: background-color 0.3s;
+}
+
+.heroIndicatorActive {
+  background: #ffffff;
+}
+
+.heroDiagonalBlue {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 120px;
+  background: linear-gradient(90deg, #0066ba, #2d9ee0);
+  clip-path: polygon(30% 78%, 100% 12%, 100% 22%, 30% 84%);
+  z-index: 3;
+}
+
+.heroDiagonalWhite {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 120px;
+  background: #ffffff;
+  clip-path: polygon(0 100%, 0 85%, 100% 22%, 100% 100%);
+  z-index: 4;
 }
 
 .heroTitle {
@@ -408,6 +466,13 @@
   font-size: 0.9375rem;
   color: #ffffff;
   margin: 0 0 1.5rem;
+}
+
+.localMap {
+  width: 100%;
+  height: 200px;
+  border: none;
+  border-radius: 8px;
 }
 
 .localMap {
