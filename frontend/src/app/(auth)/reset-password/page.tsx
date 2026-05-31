@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, FormEvent } from "react";
+import { Suspense, useState, FormEvent } from "react";
 import { useSearchParams } from "next/navigation";
 import Input from "@/components/ui/Input";
 import Button from "@/components/ui/Button";
@@ -42,6 +42,14 @@ function validate(password: string, confirmPassword: string): FormErrors {
 }
 
 export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={null}>
+      <ResetPasswordForm />
+    </Suspense>
+  );
+}
+
+function ResetPasswordForm() {
   const searchParams = useSearchParams();
   const token = searchParams.get("token") || "";
 
