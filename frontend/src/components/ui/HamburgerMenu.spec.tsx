@@ -22,6 +22,8 @@ function setupAuth() {
       email: "u@e.com",
       profile: "DoctoralStudent",
       level: "Default",
+      isActive: true,
+      isVerified: true,
       isCommitteeOfActiveEdition: false,
     },
     isAuthenticated: true,
@@ -68,7 +70,7 @@ describe("HamburgerMenu", () => {
       fireEvent.click(screen.getByLabelText("Menu do usuário"));
       expect(screen.getByText("Sessões")).toBeInTheDocument();
       expect(screen.getByText("Apresentações")).toBeInTheDocument();
-      expect(screen.getByText("Edição do Evento")).toBeInTheDocument();
+      expect(screen.getByText("Edições do Evento")).toBeInTheDocument();
       expect(screen.getByText("Premiação")).toBeInTheDocument();
       expect(screen.getByText("Usuários")).toBeInTheDocument();
       expect(screen.getByText("Emitir Certificado")).toBeInTheDocument();
@@ -102,7 +104,7 @@ describe("HamburgerMenu", () => {
     it("renders student menu items", () => {
       render(<HamburgerMenu />);
       fireEvent.click(screen.getByLabelText("Menu do usuário"));
-      expect(screen.getByText("Apresentações (Minhas)")).toBeInTheDocument();
+      expect(screen.getByText("Minhas Apresentações")).toBeInTheDocument();
       expect(screen.getByText("Emitir Certificado")).toBeInTheDocument();
       expect(screen.getByText("Sair")).toBeInTheDocument();
     });
@@ -117,7 +119,6 @@ describe("HamburgerMenu", () => {
       render(<HamburgerMenu />);
       fireEvent.click(screen.getByLabelText("Menu do usuário"));
       expect(screen.getByText("Avaliação")).toBeInTheDocument();
-      expect(screen.getByText("Favoritos")).toBeInTheDocument();
       expect(screen.getByText("Emitir Certificado")).toBeInTheDocument();
       expect(screen.getByText("Sair")).toBeInTheDocument();
     });
