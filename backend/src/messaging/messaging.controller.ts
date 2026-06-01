@@ -8,7 +8,7 @@ import {
 } from '@nestjs/microservices';
 import { Channel, ConsumeMessage } from 'amqplib';
 import * as nodemailer from 'nodemailer';
-import type { Transporter } from 'nodemailer';
+import type { Transporter, TransportOptions } from 'nodemailer';
 
 @Controller()
 export class MessagingController implements OnModuleInit {
@@ -33,7 +33,7 @@ export class MessagingController implements OnModuleInit {
       secure: true,
       auth: { user, pass },
       family: 4,
-    });
+    } as TransportOptions);
 
     this.logger.log(`Gmail SMTP configured for ${user}`);
   }
