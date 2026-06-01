@@ -1,5 +1,6 @@
 import { Body, Controller, Get, Post, Query, Res } from '@nestjs/common';
-import type { Response } from 'express';
+import type { Response, CookieOptions } from 'express';
+import { ConfigService } from '@nestjs/config';
 import { Public } from '../common/decorators/public.decorator';
 import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { AuthService } from './auth.service';
@@ -11,7 +12,25 @@ import { ResetPasswordDto } from './dto/reset-password.dto';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  private readonly isProduction: boolean;
+
+  constructor(
+    private readonly authService: AuthService,
+    private readonly configService: ConfigService,
+  ) {
+    this.isProduction =
+      this.configService.get<string>('NODE_ENV') === 'production';
+  }
+
+  private cookieOptions(maxAge: number): CookieOptions {
+    return {
+      httpOnly: true,
+      secure: this.isProduction,
+      sameSite: this.isProduction ? 'none' : 'lax',
+      path: '/',
+      maxAge,
+    };
+  }
 
   @Public()
   @Post('register')
@@ -39,13 +58,7 @@ export class AuthController {
   ) {
     const { token, user } = await this.authService.login(dto);
 
-    res.cookie('access_token', token, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'none',
-      path: '/',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
+    res.cookie('access_token', token, this.cookieOptions(7 * 24 * 60 * 60 * 1000));
 
     return { user };
   }
@@ -53,13 +66,7 @@ export class AuthController {
   @Public()
   @Post('logout')
   logout(@Res({ passthrough: true }) res: Response) {
-    res.cookie('access_token', '', {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'none',
-      path: '/',
-      maxAge: 0,
-    });
+    res.cookie('access_token', '', this.cookieOptions(0));
 
     return { message: 'Logged out successfully' };
   }
