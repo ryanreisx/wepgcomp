@@ -28,10 +28,8 @@ export class MessagingController implements OnModuleInit {
     );
 
     this.transporter = nodemailer.createTransport({
-      host: 'smtp.gmail.com',
-      port: 465,
-      secure: true,
-      auth: { user, pass },
+      service: 'gmail',
+      auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
       family: 4,
     } as TransportOptions);
 
