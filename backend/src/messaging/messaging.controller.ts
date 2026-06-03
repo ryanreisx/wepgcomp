@@ -1,4 +1,4 @@
-import { Controller, Logger, OnModuleInit } from '@nestjs/common';
+import { Controller, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {
   Ctx,
@@ -7,33 +7,16 @@ import {
   RmqContext,
 } from '@nestjs/microservices';
 import { Channel, ConsumeMessage } from 'amqplib';
-import * as nodemailer from 'nodemailer';
-import type { Transporter, TransportOptions } from 'nodemailer';
 
 @Controller()
-export class MessagingController implements OnModuleInit {
+export class MessagingController {
   private readonly logger = new Logger(MessagingController.name);
-  private transporter: Transporter;
-  private smtpFrom: string;
+  private emailServiceUrl: string;
+  private emailApiKey: string;
 
-  constructor(private readonly configService: ConfigService) {}
-
-  onModuleInit() {
-    const user = this.configService.get<string>('GMAIL_USER');
-    const pass = this.configService.get<string>('GMAIL_APP_PASSWORD');
-
-    this.smtpFrom = this.configService.get<string>(
-      'SMTP_FROM',
-      `"WEPGCOMP" <${user}>`,
-    );
-
-    this.transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
-      family: 4,
-    } as TransportOptions);
-
-    this.logger.log(`Gmail SMTP configured for ${user}`);
+  constructor(private readonly configService: ConfigService) {
+    this.emailServiceUrl = this.configService.get<string>('EMAIL_SERVICE_URL', '');
+    this.emailApiKey = this.configService.get<string>('EMAIL_API_KEY', '');
   }
 
   @MessagePattern('email-send')
@@ -111,12 +94,18 @@ export class MessagingController implements OnModuleInit {
       `;
     }
 
-    await this.transporter.sendMail({
-      from: this.smtpFrom,
-      to: email,
-      subject,
-      html,
+    const response = await fetch(`${this.emailServiceUrl}/api/send`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': this.emailApiKey,
+      },
+      body: JSON.stringify({ to: email, subject, html }),
     });
+
+    if (!response.ok) {
+      throw new Error(`Email service responded with ${response.status}`);
+    }
 
     this.logger.log(`[email-send] Email sent to ${email}`);
   }
