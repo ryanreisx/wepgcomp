@@ -165,7 +165,7 @@ export default function RegisterPage() {
           />
 
           <Input
-            label="Email UFBA"
+            label={profile === "Listener" ? "Email" : "Email UFBA"}
             name="email"
             type="email"
             required
