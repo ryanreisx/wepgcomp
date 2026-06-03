@@ -5,7 +5,7 @@ import SessoesPage from "@/components/pages/SessoesPage";
 
 export default function SuperadminSessoesPage() {
   return (
-    <ProtectedRoute requiredLevel="Superadmin">
+    <ProtectedRoute requiredLevel="Admin">
       <SessoesPage />
     </ProtectedRoute>
   );

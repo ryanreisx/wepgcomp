@@ -56,7 +56,7 @@ export function ProtectedRoute({
     }
 
     if (requireEditionAdmin) {
-      if (!user.isCommitteeOfActiveEdition && user.level !== "Superadmin") {
+      if (!user.isCommitteeOfActiveEdition && user.level !== "Superadmin" && user.level !== "Admin") {
         router.replace("/login");
         return;
       }
@@ -98,7 +98,7 @@ export function ProtectedRoute({
   }
 
   if (requireEditionAdmin) {
-    if (!user.isCommitteeOfActiveEdition && user.level !== "Superadmin") {
+    if (!user.isCommitteeOfActiveEdition && user.level !== "Superadmin" && user.level !== "Admin") {
       return null;
     }
   }

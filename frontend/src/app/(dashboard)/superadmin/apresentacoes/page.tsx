@@ -5,7 +5,7 @@ import ApresentacoesAdminPage from "@/components/pages/ApresentacoesAdminPage";
 
 export default function SuperadminApresentacoesPage() {
   return (
-    <ProtectedRoute requiredLevel="Superadmin">
+    <ProtectedRoute requiredLevel="Admin">
       <ApresentacoesAdminPage />
     </ProtectedRoute>
   );

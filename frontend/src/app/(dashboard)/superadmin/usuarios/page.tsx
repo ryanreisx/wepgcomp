@@ -5,7 +5,7 @@ import UsuariosPage from "@/components/pages/UsuariosPage";
 
 export default function SuperadminUsuariosPage() {
   return (
-    <ProtectedRoute requiredLevel="Superadmin">
+    <ProtectedRoute requiredLevel="Admin">
       <UsuariosPage />
     </ProtectedRoute>
   );

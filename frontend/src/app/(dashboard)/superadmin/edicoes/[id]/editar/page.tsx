@@ -9,7 +9,7 @@ export default function SuperadminEditarEdicaoPage() {
   const id = params.id as string;
 
   return (
-    <ProtectedRoute requiredLevel="Superadmin">
+    <ProtectedRoute requiredLevel="Admin">
       <EdicaoForm mode="edit" editionId={id} />
     </ProtectedRoute>
   );

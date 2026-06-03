@@ -5,7 +5,7 @@ import EdicaoForm from "@/components/forms/EdicaoForm";
 
 export default function SuperadminNovaEdicaoPage() {
   return (
-    <ProtectedRoute requiredLevel="Superadmin">
+    <ProtectedRoute requiredLevel="Admin">
       <EdicaoForm mode="create" />
     </ProtectedRoute>
   );

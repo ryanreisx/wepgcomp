@@ -5,7 +5,7 @@ import PremiacaoPage from "@/components/pages/PremiacaoPage";
 
 export default function SuperadminPremiacaoPage() {
   return (
-    <ProtectedRoute requiredLevel="Superadmin">
+    <ProtectedRoute requiredLevel="Admin">
       <PremiacaoPage />
     </ProtectedRoute>
   );
