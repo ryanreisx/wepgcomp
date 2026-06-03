@@ -1,0 +1,54 @@
+.statusBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 1rem;
+  padding: 1rem 0;
+}
+
+.spinner {
+  color: #0066ba;
+  width: 2.5rem;
+  height: 2.5rem;
+}
+
+.loadingText {
+  font-family: var(--font-poppins);
+  font-weight: 400;
+  font-size: 0.9375rem;
+  color: #555555;
+  margin: 0;
+}
+
+.successTitle {
+  font-family: var(--font-poppins);
+  font-weight: 700;
+  font-size: 1.5rem;
+  color: #03a61c;
+  margin: 0;
+}
+
+.successText {
+  font-family: var(--font-poppins);
+  font-weight: 400;
+  font-size: 0.9375rem;
+  color: #555555;
+  margin: 0;
+}
+
+.errorTitle {
+  font-family: var(--font-poppins);
+  font-weight: 700;
+  font-size: 1.5rem;
+  color: #ff1a25;
+  margin: 0;
+}
+
+.errorText {
+  font-family: var(--font-poppins);
+  font-weight: 400;
+  font-size: 0.9375rem;
+  color: #555555;
+  margin: 0;
+}
