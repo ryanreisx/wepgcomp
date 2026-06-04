@@ -22,6 +22,7 @@ export class EventEditionService {
 
     return this.repository.create({
       ...dto,
+      partnersText: dto.partnersText ?? '',
       startDate: new Date(dto.startDate),
       endDate: new Date(dto.endDate),
       submissionStartDate: new Date(dto.submissionStartDate),
