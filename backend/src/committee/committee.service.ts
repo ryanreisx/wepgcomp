@@ -45,9 +45,9 @@ export class CommitteeService {
       dto.role === CommitteeRole.OrganizingCommittee;
 
     if (isCoordinator) {
-      if (callerLevel !== UserLevel.Superadmin) {
+      if (callerLevel !== UserLevel.Superadmin && callerLevel !== UserLevel.Admin) {
         throw new ForbiddenException(
-          'Only Superadmin can assign a coordinator',
+          'Only Admin or Superadmin can assign a coordinator',
         );
       }
 
@@ -60,8 +60,8 @@ export class CommitteeService {
 
       await this.userService.updateLevel(
         dto.userId,
-        UserLevel.Superadmin,
-        UserLevel.Superadmin,
+        callerLevel,
+        callerLevel,
       );
     }
 
