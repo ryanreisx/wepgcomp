@@ -229,7 +229,10 @@ function EdicaoFormInner({ mode, editionId }: EdicaoFormProps) {
       desired.push({ userId, level: "Committee", role: "Communication" });
     }
 
-    for (const existing of existingMembers) {
+    const currentMembersRes = await getCommitteeMembersByEdition(eid);
+    const currentMembers = currentMembersRes.data.data;
+
+    for (const existing of currentMembers) {
       const stillDesired = desired.some(
         (d) => d.userId === existing.userId && d.role === existing.role
       );
@@ -239,7 +242,7 @@ function EdicaoFormInner({ mode, editionId }: EdicaoFormProps) {
     }
 
     for (const d of desired) {
-      const alreadyExists = existingMembers.some(
+      const alreadyExists = currentMembers.some(
         (e) => e.userId === d.userId && e.role === d.role
       );
       if (!alreadyExists) {
@@ -251,6 +254,10 @@ function EdicaoFormInner({ mode, editionId }: EdicaoFormProps) {
         });
       }
     }
+
+    setExistingMembers(
+      (await getCommitteeMembersByEdition(eid)).data.data
+    );
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
