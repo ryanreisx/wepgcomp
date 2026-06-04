@@ -24,8 +24,8 @@ export class CreateEventEditionDto {
   callForPapersText: string;
 
   @IsString()
-  @IsNotEmpty()
-  partnersText: string;
+  @IsOptional()
+  partnersText?: string;
 
   @IsString()
   @IsNotEmpty()
