@@ -51,24 +51,33 @@ export default function ApresentacoesAdminPage() {
         if (cancelled) return;
         setEditionId(eid);
 
-        const [subsRes, blocksRes, profsRes] = await Promise.all([
+        const [subsRes, blocksRes] = await Promise.all([
           getSubmissions(eid),
           getPresentationBlocksByEdition(eid),
-          getProfessors(),
         ]);
 
         if (cancelled) return;
         setSubmissions(subsRes.data.data);
         setBlocks(blocksRes.data.data);
-        setProfessors(profsRes.data.data);
 
+        let allUsers: User[] = [];
         try {
           const usersRes = await getUsers();
-          if (!cancelled) {
-            setUsers(usersRes.data.data);
-          }
+          allUsers = usersRes.data.data;
         } catch {
-          // user may not have Admin level — author names unavailable
+          // fallback: ignored
+        }
+
+        if (cancelled) return;
+        setUsers(allUsers);
+
+        try {
+          const profsRes = await getProfessors();
+          if (!cancelled) setProfessors(profsRes.data.data);
+        } catch {
+          if (!cancelled) {
+            setProfessors(allUsers.filter((u: User) => u.profile === "Professor"));
+          }
         }
       } catch {
         // silent — user sees empty state
