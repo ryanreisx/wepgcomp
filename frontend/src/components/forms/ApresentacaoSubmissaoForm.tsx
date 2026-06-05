@@ -12,7 +12,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { User } from "@/types/user";
 import { PresentationBlock } from "@/types/presentation";
 import { getActiveEventEdition } from "@/services/event-edition.service";
-import { getUsers } from "@/services/user.service";
+import { getProfessors } from "@/services/user.service";
 import { getPresentationBlocksByEdition } from "@/services/presentation.service";
 import {
   createSubmission,
@@ -91,15 +91,13 @@ export default function ApresentacaoSubmissaoForm({
 
         setEditionId(edition.id);
 
-        const [usersRes, blocksRes] = await Promise.all([
-          getUsers(),
+        const [profsRes, blocksRes] = await Promise.all([
+          getProfessors(),
           getPresentationBlocksByEdition(edition.id),
         ]);
 
         if (cancelled) return;
-        setProfessors(
-          usersRes.data.data.filter((u: User) => u.profile === "Professor")
-        );
+        setProfessors(profsRes.data.data);
         setBlocks(blocksRes.data.data);
 
         if (submissionId) {
