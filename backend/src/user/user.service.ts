@@ -63,6 +63,13 @@ export class UserService {
     });
   }
 
+  async findProfessors(): Promise<UserAccount[]> {
+    const users = await this.userRepository.findAll();
+    return users.filter(
+      (u) => u.profile === Profile.Professor && u.isActive,
+    );
+  }
+
   async findPendingProfessors(): Promise<UserAccount[]> {
     const users = await this.userRepository.findAll();
     return users.filter(

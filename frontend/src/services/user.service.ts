@@ -3,6 +3,9 @@ import { User, UserLevel } from "@/types/user";
 
 export const getUsers = () => api.get<{ data: User[] }>("/users");
 
+export const getProfessors = () =>
+  api.get<{ data: User[] }>("/users/professors");
+
 export const getPendingUsers = () =>
   api.get<{ data: User[] }>("/users/pending");
 

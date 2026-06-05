@@ -11,7 +11,7 @@ import { Submission } from "@/types/submission";
 import { User } from "@/types/user";
 import { PresentationBlock } from "@/types/presentation";
 import { getSubmissions, updateSubmission } from "@/services/submission.service";
-import { getUsers } from "@/services/user.service";
+import { getUsers, getProfessors } from "@/services/user.service";
 import { getActiveEventEdition } from "@/services/event-edition.service";
 import { getPresentationBlocksByEdition } from "@/services/presentation.service";
 import type { ApresentacaoFormData } from "@/components/forms/ApresentacaoEditModal";
@@ -51,18 +51,25 @@ export default function ApresentacoesAdminPage() {
         if (cancelled) return;
         setEditionId(eid);
 
-        const [subsRes, usersRes, blocksRes] = await Promise.all([
+        const [subsRes, blocksRes, profsRes] = await Promise.all([
           getSubmissions(eid),
-          getUsers(),
           getPresentationBlocksByEdition(eid),
+          getProfessors(),
         ]);
 
         if (cancelled) return;
         setSubmissions(subsRes.data.data);
-        const allUsers = usersRes.data.data;
-        setUsers(allUsers);
-        setProfessors(allUsers.filter((u: User) => u.profile === "Professor"));
         setBlocks(blocksRes.data.data);
+        setProfessors(profsRes.data.data);
+
+        try {
+          const usersRes = await getUsers();
+          if (!cancelled) {
+            setUsers(usersRes.data.data);
+          }
+        } catch {
+          // user may not have Admin level — author names unavailable
+        }
       } catch {
         // silent — user sees empty state
       } finally {

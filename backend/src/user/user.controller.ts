@@ -26,6 +26,13 @@ export class UserController {
     return { data };
   }
 
+  @Get('professors')
+  @Levels(UserLevel.Default)
+  async findProfessors() {
+    const data = await this.userService.findProfessors();
+    return { data };
+  }
+
   @Get('pending')
   async findPending() {
     const data = await this.userService.findPendingProfessors();
