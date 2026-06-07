@@ -12,7 +12,6 @@ import { Submission } from "@/types/submission";
 import { User } from "@/types/user";
 import { Presentation } from "@/types/presentation";
 import { getActiveEventEdition } from "@/services/event-edition.service";
-import { getSubmissions } from "@/services/submission.service";
 import { getUsers } from "@/services/user.service";
 import { getPresentationsByEdition } from "@/services/presentation.service";
 import { getMyBookmarks } from "@/services/favorite.service";
@@ -58,21 +57,24 @@ export default function AvaliacaoListagemPage() {
           return;
         }
 
-        const [subsRes, usersRes, presRes] = await Promise.all([
-          getSubmissions(edition.id),
-          getUsers(),
-          getPresentationsByEdition(edition.id),
-        ]);
-
+        const presRes = await getPresentationsByEdition(edition.id);
         if (cancelled) return;
-        setSubmissions(subsRes.data.data);
-        setUsers(usersRes.data.data);
+
+        const presentations = presRes.data.data as (Presentation & { submission: Submission })[];
+        setSubmissions(presentations.map((p) => p.submission));
 
         const map: Record<string, string> = {};
-        (presRes.data.data as Presentation[]).forEach((p) => {
+        presentations.forEach((p) => {
           map[p.submissionId] = p.id;
         });
         setSubToPres(map);
+
+        try {
+          const usersRes = await getUsers();
+          if (!cancelled) setUsers(usersRes.data.data);
+        } catch {
+          // users endpoint requires auth — proceed without author names
+        }
 
         if (isAuthenticated) {
           try {
