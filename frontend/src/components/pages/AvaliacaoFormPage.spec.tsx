@@ -2,7 +2,6 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import AvaliacaoFormPage from "./AvaliacaoFormPage";
 import { useAuth } from "@/hooks/useAuth";
 import * as submissionService from "@/services/submission.service";
-import * as userService from "@/services/user.service";
 import * as eventEditionService from "@/services/event-edition.service";
 import * as evaluationService from "@/services/evaluation.service";
 import * as presentationService from "@/services/presentation.service";
@@ -10,7 +9,6 @@ import * as favoriteService from "@/services/favorite.service";
 
 jest.mock("@/hooks/useAuth");
 jest.mock("@/services/submission.service");
-jest.mock("@/services/user.service");
 jest.mock("@/services/event-edition.service");
 jest.mock("@/services/evaluation.service");
 jest.mock("@/services/presentation.service");
@@ -24,7 +22,6 @@ jest.mock("next/navigation", () => ({
 
 const mockedUseAuth = useAuth as jest.MockedFunction<typeof useAuth>;
 const mockedSubService = submissionService as jest.Mocked<typeof submissionService>;
-const mockedUserService = userService as jest.Mocked<typeof userService>;
 const mockedEditionService = eventEditionService as jest.Mocked<typeof eventEditionService>;
 const mockedEvalService = evaluationService as jest.Mocked<typeof evaluationService>;
 const mockedPresService = presentationService as jest.Mocked<typeof presentationService>;
@@ -70,17 +67,6 @@ const mockSubmission = {
   updatedAt: "2024-01-01T00:00:00.000Z",
 };
 
-const mockAuthor = {
-  id: "user-a",
-  name: "Alice Silva",
-  email: "alice@t.com",
-  profile: "DoctoralStudent" as const,
-  level: "Default" as const,
-  isActive: true,
-  isVerified: true,
-  isCommitteeOfActiveEdition: false,
-};
-
 const mockCriteria = [
   {
     id: "crit-1",
@@ -120,6 +106,12 @@ const mockPresentations = [
     status: "Scheduled" as const,
     createdAt: "2024-01-01T00:00:00.000Z",
     updatedAt: "2024-01-01T00:00:00.000Z",
+    submission: {
+      id: "sub-1",
+      title: "Machine Learning Aplicado",
+      mainAuthorId: "user-a",
+      mainAuthor: { id: "user-a", name: "Alice Silva" },
+    },
   },
 ];
 
@@ -142,9 +134,6 @@ function setupMocks() {
 
   mockedSubService.getSubmissionById.mockResolvedValue({
     data: { data: mockSubmission },
-  } as never);
-  mockedUserService.getUserById.mockResolvedValue({
-    data: { data: mockAuthor },
   } as never);
   mockedEditionService.getActiveEventEdition.mockResolvedValue({
     data: { data: mockEdition },

@@ -2,15 +2,11 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import AvaliacaoListagemPage from "./AvaliacaoListagemPage";
 import { useAuth } from "@/hooks/useAuth";
 import * as eventEditionService from "@/services/event-edition.service";
-import * as submissionService from "@/services/submission.service";
-import * as userService from "@/services/user.service";
 import * as presentationService from "@/services/presentation.service";
 import * as favoriteService from "@/services/favorite.service";
 
 jest.mock("@/hooks/useAuth");
 jest.mock("@/services/event-edition.service");
-jest.mock("@/services/submission.service");
-jest.mock("@/services/user.service");
 jest.mock("@/services/presentation.service");
 jest.mock("@/services/favorite.service");
 
@@ -22,8 +18,6 @@ jest.mock("next/navigation", () => ({
 
 const mockedUseAuth = useAuth as jest.MockedFunction<typeof useAuth>;
 const mockedEditionService = eventEditionService as jest.Mocked<typeof eventEditionService>;
-const mockedSubService = submissionService as jest.Mocked<typeof submissionService>;
-const mockedUserService = userService as jest.Mocked<typeof userService>;
 const mockedPresService = presentationService as jest.Mocked<typeof presentationService>;
 const mockedFavService = favoriteService as jest.Mocked<typeof favoriteService>;
 
@@ -53,58 +47,6 @@ const mockEdition = {
   updatedAt: "2024-01-01T00:00:00.000Z",
 };
 
-const mockSubmissions = [
-  {
-    id: "sub-1",
-    advisorId: "adv-1",
-    mainAuthorId: "user-a",
-    eventEditionId: "ed-1",
-    title: "Machine Learning Aplicado",
-    abstract: "Resumo ML",
-    pdfFile: "f1.pdf",
-    phoneNumber: "71999",
-    status: "Accepted" as const,
-    createdAt: "2024-01-01T00:00:00.000Z",
-    updatedAt: "2024-01-01T00:00:00.000Z",
-  },
-  {
-    id: "sub-2",
-    advisorId: "adv-2",
-    mainAuthorId: "user-b",
-    eventEditionId: "ed-1",
-    title: "Redes Neurais Profundas",
-    abstract: "Resumo RN",
-    pdfFile: "f2.pdf",
-    phoneNumber: "71999",
-    status: "Accepted" as const,
-    createdAt: "2024-01-02T00:00:00.000Z",
-    updatedAt: "2024-01-02T00:00:00.000Z",
-  },
-];
-
-const mockUsers = [
-  {
-    id: "user-a",
-    name: "Alice",
-    email: "alice@t.com",
-    profile: "DoctoralStudent" as const,
-    level: "Default" as const,
-    isActive: true,
-    isVerified: true,
-    isCommitteeOfActiveEdition: false,
-  },
-  {
-    id: "user-b",
-    name: "Bob",
-    email: "bob@t.com",
-    profile: "DoctoralStudent" as const,
-    level: "Default" as const,
-    isActive: true,
-    isVerified: true,
-    isCommitteeOfActiveEdition: false,
-  },
-];
-
 const mockPresentations = [
   {
     id: "pres-1",
@@ -114,6 +56,12 @@ const mockPresentations = [
     status: "Scheduled" as const,
     createdAt: "2024-01-01T00:00:00.000Z",
     updatedAt: "2024-01-01T00:00:00.000Z",
+    submission: {
+      id: "sub-1",
+      title: "Machine Learning Aplicado",
+      mainAuthorId: "user-a",
+      mainAuthor: { id: "user-a", name: "Alice" },
+    },
   },
   {
     id: "pres-2",
@@ -123,6 +71,12 @@ const mockPresentations = [
     status: "Scheduled" as const,
     createdAt: "2024-01-01T00:00:00.000Z",
     updatedAt: "2024-01-01T00:00:00.000Z",
+    submission: {
+      id: "sub-2",
+      title: "Redes Neurais Profundas",
+      mainAuthorId: "user-b",
+      mainAuthor: { id: "user-b", name: "Bob" },
+    },
   },
 ];
 
@@ -170,12 +124,6 @@ function setupMocks(opts?: { authenticated?: boolean; restricted?: boolean }) {
 
   mockedEditionService.getActiveEventEdition.mockResolvedValue({
     data: { data: edition },
-  } as never);
-  mockedSubService.getSubmissions.mockResolvedValue({
-    data: { data: mockSubmissions },
-  } as never);
-  mockedUserService.getUsers.mockResolvedValue({
-    data: { data: mockUsers },
   } as never);
   mockedPresService.getPresentationsByEdition.mockResolvedValue({
     data: { data: mockPresentations },

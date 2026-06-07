@@ -9,10 +9,9 @@ import Modal from "@/components/ui/Modal";
 import FavoriteToggle from "@/components/ui/FavoriteToggle";
 import { useAuth } from "@/hooks/useAuth";
 import { Submission } from "@/types/submission";
-import { User } from "@/types/user";
 import { EvaluationCriteria } from "@/types/evaluation";
+import { Presentation } from "@/types/presentation";
 import { getSubmissionById } from "@/services/submission.service";
-import { getUserById } from "@/services/user.service";
 import { getActiveEventEdition } from "@/services/event-edition.service";
 import {
   getEvaluationCriteria,
@@ -34,7 +33,7 @@ export default function AvaliacaoFormPage({
 
   const [isLoading, setIsLoading] = useState(true);
   const [submission, setSubmission] = useState<Submission | null>(null);
-  const [author, setAuthor] = useState<User | null>(null);
+  const [authorName, setAuthorName] = useState<string>("");
   const [criteria, setCriteria] = useState<EvaluationCriteria[]>([]);
   const [presentationId, setPresentationId] = useState<string | null>(null);
   const [isBookmarked, setIsBookmarked] = useState(false);
@@ -69,21 +68,22 @@ export default function AvaliacaoFormPage({
         const edition = editionRes.data.data;
         setSubmission(sub);
 
-        const [authorRes, criteriaRes, presRes] = await Promise.all([
-          getUserById(sub.mainAuthorId),
+        const [criteriaRes, presRes] = await Promise.all([
           getEvaluationCriteria(edition.id),
           getPresentationsByEdition(edition.id),
         ]);
 
         if (cancelled) return;
-        setAuthor(authorRes.data.data);
         setCriteria(criteriaRes.data.data);
 
-        const pres = presRes.data.data.find(
+        const pres = (presRes.data.data as Presentation[]).find(
           (p) => p.submissionId === submissionId
         );
         if (pres) {
           setPresentationId(pres.id);
+          if (pres.submission?.mainAuthor?.name) {
+            setAuthorName(pres.submission.mainAuthor.name);
+          }
           if (isAuthenticated) {
             try {
               const bookRes = await checkBookmark(pres.id);
@@ -177,7 +177,7 @@ export default function AvaliacaoFormPage({
     );
   }
 
-  if (!submission || !author) {
+  if (!submission) {
     return (
       <>
         <HeroBanner title="Avaliação" />
@@ -195,10 +195,10 @@ export default function AvaliacaoFormPage({
       <div className={styles.container}>
         <div className={styles.presentationCard}>
           <div className={styles.avatarPlaceholder}>
-            {author.name.charAt(0).toUpperCase()}
+            {authorName ? authorName.charAt(0).toUpperCase() : "?"}
           </div>
           <div className={styles.cardInfo}>
-            <h3 className={styles.authorName}>{author.name}</h3>
+            <h3 className={styles.authorName}>{authorName}</h3>
             <p className={styles.submissionTitle}>{submission.title}</p>
           </div>
           {isAuthenticated && presentationId && (

@@ -11,7 +11,9 @@ import {
 } from '@prisma/client';
 
 export type PresentationWithSubmission = Presentation & {
-  submission: Submission;
+  submission: Submission & {
+    mainAuthor: Pick<UserAccount, 'id' | 'name'>;
+  };
 };
 
 export type PresentationWithEvaluationData = Presentation & {
@@ -39,7 +41,11 @@ export class PresentationRepository {
   ): Promise<PresentationWithSubmission[]> {
     return this.prisma.presentation.findMany({
       where: { presentationBlock: { eventEditionId } },
-      include: { submission: true },
+      include: {
+        submission: {
+          include: { mainAuthor: { select: { id: true, name: true } } },
+        },
+      },
     });
   }
 

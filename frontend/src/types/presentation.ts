@@ -25,6 +25,13 @@ export interface Presentation {
   evaluatorsAverageScore?: number | null;
   createdAt: string;
   updatedAt: string;
+  submission?: {
+    id: string;
+    title: string;
+    mainAuthorId: string;
+    mainAuthor?: { id: string; name: string };
+    [key: string]: unknown;
+  };
 }
 
 export interface Panelist {

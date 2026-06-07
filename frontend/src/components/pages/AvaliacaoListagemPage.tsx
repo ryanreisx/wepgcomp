@@ -8,11 +8,8 @@ import Tabs from "@/components/ui/Tabs";
 import Button from "@/components/ui/Button";
 import FavoriteToggle from "@/components/ui/FavoriteToggle";
 import { useAuth } from "@/hooks/useAuth";
-import { Submission } from "@/types/submission";
-import { User } from "@/types/user";
 import { Presentation } from "@/types/presentation";
 import { getActiveEventEdition } from "@/services/event-edition.service";
-import { getUsers } from "@/services/user.service";
 import { getPresentationsByEdition } from "@/services/presentation.service";
 import { getMyBookmarks } from "@/services/favorite.service";
 import styles from "./AvaliacaoListagemPage.module.css";
@@ -28,10 +25,15 @@ export default function AvaliacaoListagemPage() {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const router = useRouter();
 
+  interface PresentationItem {
+    submissionId: string;
+    presentationId: string;
+    title: string;
+    authorName: string;
+  }
+
   const [isLoading, setIsLoading] = useState(true);
-  const [submissions, setSubmissions] = useState<Submission[]>([]);
-  const [users, setUsers] = useState<User[]>([]);
-  const [subToPres, setSubToPres] = useState<Record<string, string>>({});
+  const [items, setItems] = useState<PresentationItem[]>([]);
   const [bookmarkedPresIds, setBookmarkedPresIds] = useState<Set<string>>(
     new Set()
   );
@@ -60,21 +62,15 @@ export default function AvaliacaoListagemPage() {
         const presRes = await getPresentationsByEdition(edition.id);
         if (cancelled) return;
 
-        const presentations = presRes.data.data as (Presentation & { submission: Submission })[];
-        setSubmissions(presentations.map((p) => p.submission));
-
-        const map: Record<string, string> = {};
-        presentations.forEach((p) => {
-          map[p.submissionId] = p.id;
-        });
-        setSubToPres(map);
-
-        try {
-          const usersRes = await getUsers();
-          if (!cancelled) setUsers(usersRes.data.data);
-        } catch {
-          // users endpoint requires auth — proceed without author names
-        }
+        const presentations = presRes.data.data as Presentation[];
+        setItems(
+          presentations.map((p) => ({
+            submissionId: p.submissionId,
+            presentationId: p.id,
+            title: p.submission?.title || "",
+            authorName: p.submission?.mainAuthor?.name || "",
+          }))
+        );
 
         if (isAuthenticated) {
           try {
@@ -103,11 +99,6 @@ export default function AvaliacaoListagemPage() {
     };
   }, [isAuthenticated, authLoading, router]);
 
-  const getAuthorName = (authorId: string): string => {
-    const u = users.find((usr) => usr.id === authorId);
-    return u?.name || "";
-  };
-
   const handleFavoriteChange = (presentationId: string, next: boolean) => {
     setBookmarkedPresIds((prev) => {
       const s = new Set(prev);
@@ -117,16 +108,15 @@ export default function AvaliacaoListagemPage() {
     });
   };
 
-  const allFiltered = submissions.filter((s) =>
-    s.title.toLowerCase().includes(search.toLowerCase())
+  const allFiltered = items.filter((item) =>
+    item.title.toLowerCase().includes(search.toLowerCase())
   );
 
   const tabFiltered =
     activeTab === "favorites"
-      ? allFiltered.filter((s) => {
-          const presId = subToPres[s.id];
-          return presId && bookmarkedPresIds.has(presId);
-        })
+      ? allFiltered.filter((item) =>
+          bookmarkedPresIds.has(item.presentationId)
+        )
       : allFiltered;
 
   const displayed = showAll
@@ -176,36 +166,35 @@ export default function AvaliacaoListagemPage() {
         {!isLoading && tabFiltered.length > 0 && (
           <>
             <div className={styles.list}>
-              {displayed.map((sub) => {
-                const presId = subToPres[sub.id];
-                const isFav = presId ? bookmarkedPresIds.has(presId) : false;
+              {displayed.map((item) => {
+                const isFav = bookmarkedPresIds.has(item.presentationId);
 
                 return (
                   <div
-                    key={sub.id}
+                    key={item.submissionId}
                     className={styles.cardRow}
                     onClick={() =>
-                      router.push(`/ouvinte/avaliacao/${sub.id}`)
+                      router.push(`/ouvinte/avaliacao/${item.submissionId}`)
                     }
                     role="button"
                     tabIndex={0}
                     onKeyDown={(e) => {
                       if (e.key === "Enter")
-                        router.push(`/ouvinte/avaliacao/${sub.id}`);
+                        router.push(`/ouvinte/avaliacao/${item.submissionId}`);
                     }}
                   >
                     <div className={styles.cardContent}>
-                      <h3 className={styles.cardTitle}>{sub.title}</h3>
+                      <h3 className={styles.cardTitle}>{item.title}</h3>
                       <p className={styles.cardSubtitle}>
-                        {getAuthorName(sub.mainAuthorId)}
+                        {item.authorName}
                       </p>
                     </div>
-                    {isAuthenticated && presId && (
+                    {isAuthenticated && (
                       <FavoriteToggle
-                        presentationId={presId}
+                        presentationId={item.presentationId}
                         initialIsFavorite={isFav}
                         onChange={(next) =>
-                          handleFavoriteChange(presId, next)
+                          handleFavoriteChange(item.presentationId, next)
                         }
                       />
                     )}
