@@ -15,6 +15,13 @@ export interface PresentationBlock {
   updatedAt: string;
 }
 
+export interface PresentationSubmission {
+  id: string;
+  title: string;
+  mainAuthorId: string;
+  mainAuthor?: { id: string; name: string };
+}
+
 export interface Presentation {
   id: string;
   submissionId: string;
@@ -25,13 +32,7 @@ export interface Presentation {
   evaluatorsAverageScore?: number | null;
   createdAt: string;
   updatedAt: string;
-  submission?: {
-    id: string;
-    title: string;
-    mainAuthorId: string;
-    mainAuthor?: { id: string; name: string };
-    [key: string]: unknown;
-  };
+  submission?: PresentationSubmission;
 }
 
 export interface Panelist {

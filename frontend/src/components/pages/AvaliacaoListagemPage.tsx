@@ -14,6 +14,13 @@ import { getPresentationsByEdition } from "@/services/presentation.service";
 import { getMyBookmarks } from "@/services/favorite.service";
 import styles from "./AvaliacaoListagemPage.module.css";
 
+interface PresentationItem {
+  submissionId: string;
+  presentationId: string;
+  title: string;
+  authorName: string;
+}
+
 const TABS = [
   { label: "Todas as apresentações", value: "all" },
   { label: "Apenas favoritos", value: "favorites" },
@@ -24,13 +31,6 @@ const INITIAL_DISPLAY_COUNT = 5;
 export default function AvaliacaoListagemPage() {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const router = useRouter();
-
-  interface PresentationItem {
-    submissionId: string;
-    presentationId: string;
-    title: string;
-    authorName: string;
-  }
 
   const [isLoading, setIsLoading] = useState(true);
   const [items, setItems] = useState<PresentationItem[]>([]);
