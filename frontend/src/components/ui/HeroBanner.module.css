@@ -11,32 +11,6 @@
   overflow: hidden;
 }
 
-.hero::before {
-  content: '';
-  position: absolute;
-  bottom: -30px;
-  left: -5%;
-  width: 110%;
-  height: 80px;
-  background: linear-gradient(90deg, transparent 35%, #0066ba 60%, #2d9ee0 100%);
-  transform: rotate(-4deg);
-  transform-origin: bottom left;
-  z-index: 2;
-}
-
-.hero::after {
-  content: '';
-  position: absolute;
-  bottom: -30px;
-  left: -5%;
-  width: 110%;
-  height: 80px;
-  background: #ffffff;
-  transform: rotate(-3deg);
-  transform-origin: bottom left;
-  z-index: 3;
-  border-radius: 0 8px 0 0;
-}
 
 .overlay {
   position: absolute;
