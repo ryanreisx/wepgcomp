@@ -19,30 +19,6 @@
   margin: 0;
 }
 
-.steps {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.step {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--font-poppins);
-  font-weight: 600;
-  font-size: 0.875rem;
-  background-color: #d4d4d4;
-  color: #555555;
-}
-
-.stepActive {
-  background-color: #ffa90f;
-  color: #ffffff;
-}
-
 .authorHeader {
   display: flex;
   align-items: center;

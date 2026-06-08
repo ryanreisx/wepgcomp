@@ -241,11 +241,6 @@ export default function ApresentacaoSubmissaoForm({
           <h2 className={styles.title}>
             {isEditMode ? "Editar Apresentação" : "Cadastro de Apresentação"}
           </h2>
-          <div className={styles.steps}>
-            <span className={`${styles.step} ${styles.stepActive}`}>1</span>
-            <span className={styles.step}>2</span>
-            <span className={styles.step}>3</span>
-          </div>
         </div>
 
         {user && (
