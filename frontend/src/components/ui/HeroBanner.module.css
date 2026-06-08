@@ -41,8 +41,8 @@
 .overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, #0066ba 0%, #054b75 100%);
-  opacity: 0.9;
+  background: url('/images/hero-overlay.png') center / cover no-repeat;
+  opacity: 0.85;
 }
 
 .overlay--warm {
