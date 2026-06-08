@@ -16,7 +16,7 @@ export default function HeroBanner({
   subtitle,
   ctaText,
   ctaHref,
-  backgroundImage,
+  backgroundImage = "/images/hero-salvador.jpg",
   overlayVariant = "cool",
 }: HeroBannerProps) {
   const bgStyle = backgroundImage
