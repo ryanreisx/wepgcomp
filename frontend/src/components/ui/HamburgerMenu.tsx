@@ -36,7 +36,6 @@ const MENU_ITEMS: Record<Exclude<View, "public">, MenuItem[]> = {
   ],
   listener: [
     { label: "Avaliação", href: "/ouvinte/avaliacao" },
-    { label: "Emitir Certificado", href: "/certificados" },
   ],
 };
 
