@@ -19,7 +19,6 @@ const MENU_ITEMS: Record<Exclude<View, "public">, MenuItem[]> = {
     { label: "Edições do Evento", href: "/superadmin/edicoes" },
     { label: "Premiação", href: "/superadmin/premiacao" },
     { label: "Usuários", href: "/superadmin/usuarios" },
-    { label: "Avaliação", href: "/ouvinte/avaliacao" },
     { label: "Emitir Certificado", href: "/certificados" },
   ],
   committee: [
@@ -27,17 +26,10 @@ const MENU_ITEMS: Record<Exclude<View, "public">, MenuItem[]> = {
     { label: "Apresentações", href: "/comissao/apresentacoes" },
     { label: "Edição do Evento", href: "/comissao/edicao" },
     { label: "Premiação", href: "/comissao/premiacao" },
-    { label: "Avaliação", href: "/ouvinte/avaliacao" },
     { label: "Emitir Certificado", href: "/certificados" },
   ],
   student: [
     { label: "Minhas Apresentações", href: "/aluno/apresentacoes" },
-    { label: "Avaliação", href: "/ouvinte/avaliacao" },
-    { label: "Emitir Certificado", href: "/certificados" },
-  ],
-  professor: [
-    { label: "Premiação", href: "/comissao/premiacao" },
-    { label: "Avaliação", href: "/ouvinte/avaliacao" },
     { label: "Emitir Certificado", href: "/certificados" },
   ],
   listener: [
