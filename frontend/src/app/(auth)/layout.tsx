@@ -5,9 +5,9 @@ import Footer from "@/components/ui/Footer";
 
 const PUBLIC_LINKS = [
   { label: "Inicio", href: "/" },
-  { label: "Programação do Evento", href: "/programacao" },
+  { label: "Programação do Evento", href: "/#programacao" },
   { label: "Orientações", href: "/orientacoes" },
-  { label: "Contato", href: "/contato" },
+  { label: "Contato", href: "/#contato" },
 ];
 
 export default function AuthLayout({

@@ -195,7 +195,7 @@ export default function Home() {
               {formatDateLabel(edition.endDate)} de {editionYear}
             </p>
           )}
-          <Link href="/programacao" className={styles.heroCta}>
+          <Link href="/#programacao" className={styles.heroCta}>
             Confira a Programação
           </Link>
         </div>
@@ -214,7 +214,7 @@ export default function Home() {
       </section>
 
       {/* Programação */}
-      <section className={styles.programacao} data-testid="programacao-section">
+      <section id="programacao" className={styles.programacao} data-testid="programacao-section">
         <div className="container">
           <h2 className={styles.sectionTitle}>Programação</h2>
           <p className={styles.programacaoSubtitle}>
@@ -362,7 +362,7 @@ export default function Home() {
       </Modal>
 
       {/* Contato + Local */}
-      <section className={styles.contatoLocal} data-testid="contato-section">
+      <section id="contato" className={styles.contatoLocal} data-testid="contato-section">
         <div className="container">
           <div className="row">
             <div className="col-md-6">
